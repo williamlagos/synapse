@@ -1,0 +1,2 @@
+#!/bin/sh
+chroot /opt/x11 xinit /etc/X11/xinit/xinitrc

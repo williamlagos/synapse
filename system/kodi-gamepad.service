@@ -1,0 +1,13 @@
+[Unit]
+Description = Starts Kodi Gamepad service
+Requires = kodi.service
+After = kodi.service
+
+[Service]
+User = root
+Group = root
+Type = simple
+ExecStart = /opt/services/kodi-gamepad
+
+[Install]
+WantedBy = multi-user.target

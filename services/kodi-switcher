@@ -1,0 +1,2 @@
+#!/bin/sh
+/opt/scripts/switcher.py $1

@@ -1,0 +1,2 @@
+#!/bin/sh
+chroot /opt/web /browser start
