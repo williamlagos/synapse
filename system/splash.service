@@ -1,0 +1,9 @@
+[Unit]
+Description=Splash service
+
+[Service]
+Type=forking
+ExecStart=/opt/services/splash
+
+[Install]
+WantedBy=basic.target
