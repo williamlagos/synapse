@@ -9,7 +9,7 @@ int main (int argc, char** argv)
 	void (*hello)();
 	double (*cosine)(double);
 
-	char path[15] = "libhello.so.1";
+	char path[20] = "libhello.so.1";
 	//char path[15] = "/lib/libm.so.6"
 	handle = dlopen(path,RTLD_LAZY);
 
