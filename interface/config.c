@@ -13,7 +13,7 @@ void main(int argc, char** argv)
     if (stream == NULL) exit(EXIT_FAILURE);
     while ((linelen = getline(&line, &len, stream)) != -1) {
         if (strchr(line,'[') != NULL) continue;
-        else printf("Retrieved line of length %zu :\n", linelen);
+        else printf("Line of length %zu :\n", linelen);
         //printf("%s", line);
         key = strtok (line," =");
         printf("Key: %s\n",key);
