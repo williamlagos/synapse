@@ -6,26 +6,43 @@
 #include<sys/stat.h>
 #include<sys/types.h>
 
+#define APP 1
 #define LOOP 1
+#define BACKEND 0
 #define VERSION "0.1"
+#define MAX_TYPES 2
+#define MAX_MODULES 5
+#define CONFIG_FILE "efforia.cfg"
 
-void config()
+typedef struct {
+	char type[25];
+	char* modules[MAX_MODULES];
+} Config;
+
+void config(const char* filename, Config* relations)
 {
+	int count;
 	FILE *stream;
 	char *line = NULL;
-	char *key, *value;
+	char *key, *value, *val;
 	size_t len = 0;
 	ssize_t linelen;
-	stream = fopen("efforia.cfg", "r");
+	stream = fopen(filename, "r");
 	if (stream == NULL) exit(EXIT_FAILURE);
 	while ((linelen = getline(&line, &len, stream)) != -1) {
 		if (strchr(line,'[') != NULL) continue;
-		else printf("Line of length %zu :\n", linelen);
-		//printf("%s", line);
-		key = strtok (line," =");
-		printf("Key: %s\n",key);
-		value = strtok (NULL, " =");
-		printf("Value: %s\n",value);
+		key = strtok(line," =");
+		value = strtok(NULL," =");
+		val = strtok(value,",");
+		count = 0;
+		while (val != NULL) {
+			strcpy(relations->type,key);
+			relations->modules[count] = (char*) malloc(sizeof(val));
+			strcpy(relations->modules[count],val);
+			val = strtok(NULL,",");
+			count++;
+		}
+		relations++;
 	}
 	free(line);
 	fclose(stream);
@@ -83,18 +100,33 @@ void background()
 
 int main (int argc, char** argv)
 {
-	config();
+	int count;
+	Config* relations;
+	Config apps, backends;
+	relations = (Config*) malloc(sizeof(Config) * MAX_TYPES);
+	config(CONFIG_FILE,relations);
+	backends = relations[BACKEND];
+	apps = relations[APP];
+	free(relations);
+	printf("List of %ss:\n",apps.type);
+	for (count = 0; count < MAX_MODULES; count++) {
+		printf("%s\n",apps.modules[count]);
+	}
+	printf("List of %ss:\n",backends.type);
+	for (count = 0; count < MAX_MODULES; count++) {
+		printf("%s\n",backends.modules[count]);
+	}
 	load("hello","helloworld");
-	background();
+	//background();
 	// Open the file log and start the background service loop
 	FILE* f = NULL;
 	char info[30] = "Logging some information...\n";
   	f = fopen("efforia.log","w+");
-  	while(LOOP) {
+  	/*while(LOOP) {
     	sleep(1);
     	fprintf(f,info);
     	fflush(f);
-  	}
+  	}*/
   	fclose(f);
   	return 0;
 }
