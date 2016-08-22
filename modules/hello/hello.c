@@ -7,5 +7,6 @@ void start(int max, char** buffer)
     for (count = 0; count < max; count++) {
         printf("%s", buffer[count]);
     }
-    fprintf(stdout,"Hello World!\n");
+    printf("Hello World!\n");
+    system("kodi");
 }

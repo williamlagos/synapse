@@ -34,8 +34,7 @@ void start (int max, char** buffer)
     SDL_Init(SDL_INIT_JOYSTICK);
     joysticks = SDL_NumJoysticks();
     char message[512];
-    if (argc > 1) strcpy(message,argv[1]);
-    else strcpy(message,"");
+    strcpy(message,"Right");
     action(message);
     //system("kodi/client");
     for (i = 0; i < joysticks; i++) {
@@ -59,5 +58,4 @@ void start (int max, char** buffer)
     }
 
     SDL_Quit();
-    return 0;
 }
