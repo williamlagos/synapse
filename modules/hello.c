@@ -1,7 +1,11 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-void helloworld()
+void start(int max, char** buffer)
 {
-  fprintf(stdout,"Hello World!\n");
+    int count;
+    for (count = 0; count < max; count++) {
+        printf("%s", buffer[count]);
+    }
+    fprintf(stdout,"Hello World!\n");
 }

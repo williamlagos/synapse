@@ -28,7 +28,7 @@ void action(const char* message){
     sendto(s,buffer,BUFLEN,0,(struct sockaddr*)&address,address_length);
 }
 
-int main (int argc, char** argv)
+void start (int max, char** buffer)
 {
     int joysticks,i;
     SDL_Init(SDL_INIT_JOYSTICK);

@@ -63,15 +63,15 @@ void modules(const char* filename, Config* relations)
 	}
 }
 
-void start(const char* module, const char* func)
+void start(const char* module, int max, char** buffer)
 {
 	char* path;
 	char* error;
 	void* handle;
-	void (*function)();
+	void (*function)(int,char**);
 	// Prepare the module string path and open library
 	path = malloc(sizeof(char)*25 + sizeof(module));
-	sprintf(path, "modules/lib%s.so.1", module);
+	sprintf(path, "modules/%s/lib%s.so.1", module, module);
 	handle = dlopen(path, RTLD_LAZY);
 	// Verify if the loading was successful
 	if (!handle) {
@@ -79,13 +79,13 @@ void start(const char* module, const char* func)
 		exit(EXIT_FAILURE);
 	}
 	// Load the specified function in the module
-	function = dlsym(handle, func);
+	function = dlsym(handle, "start");
 	if ((error = dlerror()) != NULL) {
 		fputs(error, stderr);
 		exit(EXIT_FAILURE);
 	}
 	// Execute the function, then close the module
-	function();
+	function(max,buffer);
 	dlclose(handle);
 }
 
@@ -143,7 +143,9 @@ int main (int argc, char** argv)
 	for (count = 0; count < backends.n_modules; count++)
 		schedule(backends.type, backends.modules[count]);
 	free(r);
-	load("hello", "helloworld");
+	int max = 0;
+	char **lines = config("config/event.json",&max);
+	start("hello", max, lines);
 	//background();
 	// Open the file log and start the background service loop
 	FILE* f = NULL;
