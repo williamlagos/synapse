@@ -8,5 +8,6 @@ void start(int max, char** buffer)
         printf("%s", buffer[count]);
     }
     printf("Hello World!\n");
-    system("kodi");
+    // system("event");
+    // system("kodi");
 }

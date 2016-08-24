@@ -105,6 +105,12 @@ void schedule(const char* type, const char* module) {
 	}
 }
 
+void dashboard() {
+	int cfgc = 0;
+	char** cfgv = NULL;
+	start("hello", cfgc, cfgv);
+}
+
 void background()
 {
 	pid_t sid = 0;
@@ -145,8 +151,8 @@ int main (int argc, char** argv)
 	free(r);
 	int max = 0;
 	char **lines = config("config/event.json",&max);
-	start("hello", max, lines);
-	//background();
+	// background();
+	// start("hello", max, lines);
 	// Open the file log and start the background service loop
 	FILE* f = NULL;
 	char info[30] = "Logging some information...\n";
