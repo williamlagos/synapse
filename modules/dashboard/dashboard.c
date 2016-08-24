@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h>
 
 void start(int max, char** buffer)
 {
@@ -8,6 +9,6 @@ void start(int max, char** buffer)
         printf("%s", buffer[count]);
     }
     printf("Hello World!\n");
-    system("sudo /usr/bin/kodi-standalone &");
-    system("modules/dashboard/event");
+    execv("/usr/bin/kodi",NULL);
+    execv("modules/dashboard/event",NULL);
 }

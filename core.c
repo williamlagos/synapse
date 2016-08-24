@@ -105,12 +105,6 @@ void schedule(const char* type, const char* module) {
 	}
 }
 
-void dashboard() {
-	int cfgc = 0;
-	char** cfgv = NULL;
-	start("dashboard", cfgc, cfgv);
-}
-
 void background()
 {
 	pid_t sid = 0;
@@ -133,6 +127,13 @@ void background()
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
+}
+
+void dashboard() {
+	int cfgc = 0;
+	char** cfgv = NULL;
+	background();
+	start("dashboard", cfgc, cfgv);
 }
 
 int main (int argc, char** argv)
