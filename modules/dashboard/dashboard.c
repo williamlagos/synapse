@@ -8,6 +8,6 @@ void start(int max, char** buffer)
         printf("%s", buffer[count]);
     }
     printf("Hello World!\n");
-    // system("event");
-    // system("kodi");
+    system("sudo /usr/bin/kodi-standalone &");
+    system("modules/dashboard/event");
 }
