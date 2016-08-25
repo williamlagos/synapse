@@ -129,16 +129,22 @@ void background()
 	close(STDERR_FILENO);
 }
 
-void dashboard() {
-	int cfgc = 0;
-	char** cfgv = NULL;
-	background();
-	start("dashboard", cfgc, cfgv);
+int dashboard() {
+	// pid_t eventserver_id = 0;
+	pid_t dashboard_id = 0;
+	dashboard_id = fork();
+	if (dashboard_id == 0) {
+		/*eventserver_id = fork();
+		if (eventserver_id == 0)
+			execv("modules/dashboard/event",NULL);
+		else*/ execv("/usr/lib/kodi/kodi.bin",NULL);
+    }
+	return dashboard_id;
 }
 
 int main (int argc, char** argv)
 {
-	int count;
+	int count,app;
 	Config apps, backends, *r;
 	r = (Config*) malloc(sizeof(Config) * MAX_TYPES);
 	modules(DEFAULT_CONFIGURATION_PATH, r);
@@ -152,7 +158,8 @@ int main (int argc, char** argv)
 	free(r);
 	int max = 0;
 	char **lines = config("config/event.json",&max);
-	dashboard();
+	app = dashboard();
+	printf("Started %d\n",app);
 	// start("hello", max, lines);
 	// Open the file log and start the background service loop
 	FILE* f = NULL;

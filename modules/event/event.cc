@@ -1,17 +1,23 @@
 #include "event.h"
 
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <unistd.h>
 
 #define BUFLEN 512
 #define NPACK 10
 #define PORT 9930
+#define forever while(1)
 
-CAddress::CAddress(int Port = STD_PORT)
+int s;
+CXBMCClient* client;
+
+CAddress::CAddress(int Port)
 {
     m_Addr.sin_family = AF_INET;
     m_Addr.sin_port = htons(Port);
@@ -19,7 +25,7 @@ CAddress::CAddress(int Port = STD_PORT)
     memset(m_Addr.sin_zero, '\0', sizeof m_Addr.sin_zero);
 }
 
-CAddress::CAddress(const char *Address, int Port = STD_PORT)
+CAddress::CAddress(const char *Address, int Port)
 {
     m_Addr.sin_port = htons(Port);
     struct hostent *h;
@@ -63,7 +69,7 @@ bool XBMCClientUtils::Initialize()
     return true;
 }
 
-CXBMCClient::CXBMCClient(const char *IP = "127.0.0.1", int Port = 9777, int Socket = -1, unsigned int UID = 0)
+CXBMCClient::CXBMCClient(const char *IP, int Port, int Socket, unsigned int UID)
 {
     m_Addr = CAddress(IP, Port);
     if (Socket == -1) m_Socket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -144,31 +150,32 @@ void CXBMCClient::SendPING()
     delete ping;
 }
 
+void shutdown(int s)
+{
+    std::cout << "Shutdown" << std::endl;
+    close(s);
+    client->SendBYE();
+    exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char** argv)
 {
-    int s, i;
     char buf[BUFLEN];
     struct sockaddr_in address, client_address;
     socklen_t client_address_length = sizeof(client_address);
+    signal(SIGTERM,shutdown);
     s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     memset((char *) &address, 0, sizeof(address));
     address.sin_family = AF_INET;
     address.sin_port = htons(PORT);
     address.sin_addr.s_addr = htonl(INADDR_ANY);
     bind(s, (sockaddr*) &address, sizeof(address));
-    CXBMCClient* client = new CXBMCClient();
+    client = new CXBMCClient();
     client->SendHELO("HUB",ICON_NONE);
-    for (i = 0; i < NPACK; i++) {
+    forever {
         recvfrom(s, buf, BUFLEN, 0, (sockaddr*) &client_address, &client_address_length);
-        /* std::cout << "Received packet from "
-                  << inet_ntoa(client_address.sin_addr) << ":"
-                  << ntohs(client_address.sin_port)
-                  << "Data: " << buf << std::endl; */
         if (strstr(buf,"Exit")) break;
         client->SendACTION(buf,ACTION_BUTTON);
-        /* std::cout << "Sent action " << buf << std::endl; */
     }
-    close(s);
-    client->SendBYE();
     return 0;
 }

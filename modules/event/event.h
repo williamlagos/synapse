@@ -93,8 +93,8 @@ class CAddress {
     private:
         struct sockaddr_in m_Addr;
     public:
-        CAddress(int Port);
-        CAddress(const char *Address, int Port);
+        CAddress(int Port = STD_PORT);
+        CAddress(const char *Address, int Port = STD_PORT);
         void SetPort(int port);
         const sockaddr *GetAddress();
         bool Bind(int Sockfd);
@@ -304,7 +304,7 @@ class CXBMCClient {
         int           m_Socket;
         unsigned int  m_UID;
     public:
-        CXBMCClient(const char *IP, int Port, int Socket, unsigned int UID);
+        CXBMCClient(const char *IP = "127.0.0.1", int Port = 9777, int Socket = -1, unsigned int UID = 0);
         void SendNOTIFICATION(const char *Title, const char *Message, unsigned short IconType, const char *IconFile);
         void SendHELO(const char *DevName, unsigned short IconType, const char *IconFile);
         void SendButton(const char *Button, const char *DeviceMap, unsigned short Flags, unsigned short Amount);
