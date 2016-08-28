@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<string.h>
+#include<signal.h>
 #include<sys/stat.h>
 #include<sys/types.h>
 
@@ -13,12 +14,16 @@
 #define MAX_BUFFER 128
 #define MAX_PATH_SIZE 64
 #define DEFAULT_CONFIGURATION_PATH "efforia.cfg"
+#define DEFAULT_SWITCHER_PATH "/tmp/eos.access"
+#define DASHBOARD_PATH "/usr/lib/kodi/kodi.bin"
 
 typedef struct {
 	char type[25];
 	char* modules[MAX_MODULES];
 	int n_modules;
 } Config;
+
+pid_t app_id = 0;
 
 // Read configuration file and return lines buffer to manipulate
 char** config(const char* filename, int* cnt)
@@ -96,12 +101,12 @@ void schedule(const char* type, const char* module) {
 	sprintf(path, "config/%s.json", module);
 	buffer = config(path, &max);
 	if (buffer != NULL) {
-		printf("Config of %s %s:\n",module,type);
+		// printf("Config of %s %s:\n",module,type);
 		for (count = 0; count < max; count++) {
-			printf("%s", buffer[count]);
+			// printf("%s", buffer[count]);
 		}
 	} else {
-		printf("%s %s without configuration\n",module,type);
+		// printf("%s %s without configuration\n",module,type);
 	}
 }
 
@@ -111,10 +116,8 @@ void background()
 	pid_t process_id = 0;
 	// Create a fork of this application to start the daemon
 	process_id = fork();
-	if (process_id < 0) {
-		printf("Process forking failed!\n");
-		exit(EXIT_FAILURE);
-	}
+	if (process_id < 0) exit(EXIT_FAILURE);
+
 	// Exitting parent process
 	if (process_id > 0) {
 		printf("Started Efforia Core %s: %d\n", VERSION, process_id);
@@ -130,21 +133,15 @@ void background()
 }
 
 int dashboard() {
-	// pid_t eventserver_id = 0;
-	pid_t dashboard_id = 0;
-	dashboard_id = fork();
-	if (dashboard_id == 0) {
-		/*eventserver_id = fork();
-		if (eventserver_id == 0)
-			execv("modules/dashboard/event",NULL);
-		else*/ execv("/usr/lib/kodi/kodi.bin",NULL);
-    }
-	return dashboard_id;
+	app_id = fork();
+	if (app_id == 0)
+		execv(DASHBOARD_PATH,NULL);
+	return app_id;
 }
 
 int main (int argc, char** argv)
 {
-	int count,app;
+	int count;
 	Config apps, backends, *r;
 	r = (Config*) malloc(sizeof(Config) * MAX_TYPES);
 	modules(DEFAULT_CONFIGURATION_PATH, r);
@@ -156,20 +153,25 @@ int main (int argc, char** argv)
 	for (count = 0; count < backends.n_modules; count++)
 		schedule(backends.type, backends.modules[count]);
 	free(r);
-	int max = 0;
-	char **lines = config("config/event.json",&max);
-	app = dashboard();
-	printf("Started %d\n",app);
-	// start("hello", max, lines);
+	/* int max = 0;
+	char **lines = config("config/event.json",&max);*/
+	dashboard();
+
 	// Open the file log and start the background service loop
-	FILE* f = NULL;
-	char info[30] = "Logging some information...\n";
-  	f = fopen("efforia.log", "w+");
-  	/*while(LOOP) {
+	FILE* f;
+	background();
+	char executable[MAX_BUFFER];
+  	while(LOOP) {
     	sleep(1);
-    	fprintf(f, info);
-    	fflush(f);
-  	}*/
-  	fclose(f);
+		if(access(DEFAULT_SWITCHER_PATH,F_OK) != -1) {
+			kill(app_id,SIGTERM);
+			f = fopen(DEFAULT_SWITCHER_PATH,"r");
+			fgets(executable,sizeof(executable),f);
+			fclose(f);
+			remove(DEFAULT_SWITCHER_PATH);
+			system(executable);
+			dashboard();
+		}
+  	}
   	return 0;
 }
