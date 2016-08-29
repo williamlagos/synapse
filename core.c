@@ -94,20 +94,17 @@ void start(const char* module, int max, char** buffer)
 	dlclose(handle);
 }
 
-void schedule(const char* type, const char* module) {
+void schedule(const char* module) {
 	char** buffer;
 	int count, max;
 	char path[MAX_PATH_SIZE];
 	sprintf(path, "config/%s.json", module);
 	buffer = config(path, &max);
-	if (buffer != NULL) {
-		// printf("Config of %s %s:\n",module,type);
-		for (count = 0; count < max; count++) {
-			// printf("%s", buffer[count]);
-		}
-	} else {
-		// printf("%s %s without configuration\n",module,type);
-	}
+	background();
+	// Start backend with config
+	if (buffer != NULL) start(module,max,buffer);
+	// Without configuration
+	else start(module,0,NULL);
 }
 
 void background()
@@ -142,19 +139,20 @@ int dashboard() {
 int main (int argc, char** argv)
 {
 	int count;
+	char app[64], app_type[64];
 	Config apps, backends, *r;
 	r = (Config*) malloc(sizeof(Config) * MAX_TYPES);
 	modules(DEFAULT_CONFIGURATION_PATH, r);
 	apps = (strstr(r[1].type, "app") != NULL) ? r[1] : r[0];
 	backends = (strstr(r[0].type, "backend") != NULL) ? r[0] : r[1];
 
-	for (count = 0; count < apps.n_modules; count++)
-		schedule(apps.type, apps.modules[count]);
+	if(apps.n_modules == 2){
+		strcpy(app,apps.modules[0]);
+		strcpy(app_type,apps.modules[1]);
+	}
 	for (count = 0; count < backends.n_modules; count++)
-		schedule(backends.type, backends.modules[count]);
+		schedule(backends.modules[count]);
 	free(r);
-	/* int max = 0;
-	char **lines = config("config/event.json",&max);*/
 	dashboard();
 
 	// Open the file log and start the background service loop
