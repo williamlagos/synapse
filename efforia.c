@@ -6,6 +6,7 @@
 #include<signal.h>
 #include<sys/stat.h>
 #include<sys/types.h>
+#include "efforia.h"
 
 #define LOOP 1
 #define VERSION "0.1"
