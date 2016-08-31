@@ -18,9 +18,8 @@ void start(int max, char** buffer)
     /* Read the output a line at a time - output it. */
     fgets(path, sizeof(path)-1, f);
     if(strstr(path,"NTSC") || strstr(path,"PAL")){
-        system("systemctl start minidlna");
         system("systemctl start gmediarender");
-        system("systemctl start shairport-sync");
+        system("systemctl start shairplay");
     }
 
     // fprintf(stdout,"%s", path);
