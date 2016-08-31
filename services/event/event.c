@@ -10,7 +10,7 @@
 #define BUFLEN 512
 #define NPACK 10
 #define PORT 9930
-#define forever while(1)
+#define LOOP 1
 
 void action(const char* message){
     int s = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
@@ -64,7 +64,7 @@ void start(int max, char** buffer)
 
     /* fprintf(stdout,"%s \"%s\" axes:%d buttons:%d hats:%d balls:%d\n",
                guid_str, name, axes, buttons, hats, balls); */
-    forever{
+    while(LOOP){
         while(SDL_PollEvent(&event)){
             switch(event.type){
                 case SDL_JOYBUTTONDOWN:

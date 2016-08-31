@@ -1,20 +1,35 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<unistd.h>
+#include<string.h>
+
+#define HDMISTATUS_COMMAND_PATH "/opt/vc/bin/tvservice -s"
 
 void start(int max, char** buffer)
 {
-    /*int count;
-    for (count = 0; count < max; count++) {
-        printf("%s", buffer[count]);
+    char path[1035];
+
+    /* Open the command for reading. */
+    FILE *f = popen(HDMISTATUS_COMMAND_PATH, "r");
+    if(f == NULL){
+        printf("Failed to run command\n" );
+        exit(EXIT_FAILURE);
     }
-    printf("Hello World!\n");*/
-    pid_t event_id = 0;
-    event_id = fork();
-    if (event_id == 0) {
-        execv("/usr/lib/kodi/kodi.bin",NULL);
-    } else {
-        printf("Started dashboard %d",event_id);
-        execv("modules/dashboard/event",NULL);
+
+    /* Read the output a line at a time - output it. */
+    fgets(path, sizeof(path)-1, f);
+    if(strstr(path,"NTSC") || strstr(path,"PAL")){
+        system("systemctl start minidlna");
+        system("systemctl start gmediarender");
+        system("systemctl start shairport-sync");
     }
+
+    // fprintf(stdout,"%s", path);
+    /* close */
+    pclose(f);
+}
+
+int main(int argc, char** argv)
+{
+    start(argc,argv);
+    return EXIT_SUCCESS;
 }
