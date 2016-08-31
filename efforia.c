@@ -8,22 +8,6 @@
 #include<sys/types.h>
 #include "efforia.h"
 
-#define LOOP 1
-#define VERSION "0.1"
-#define MAX_TYPES 2
-#define MAX_MODULES 10
-#define MAX_BUFFER 128
-#define MAX_PATH_SIZE 64
-#define DEFAULT_CONFIGURATION_PATH "efforia.cfg"
-#define DEFAULT_SWITCHER_PATH "/tmp/eos.access"
-#define DASHBOARD_PATH "/usr/lib/kodi/kodi.bin"
-
-typedef struct {
-	char type[25];
-	char* modules[MAX_MODULES];
-	int n_modules;
-} Config;
-
 pid_t app_id = 0;
 
 // Read configuration file and return lines buffer to manipulate
@@ -71,13 +55,13 @@ void modules(const char* filename, Config* relations)
 
 void start(const char* module, int max, char** buffer)
 {
-	char* path;
 	char* error;
 	void* handle;
+	char path[128];
 	void (*function)(int,char**);
 	// Prepare the module string path and open library
-	path = malloc(sizeof(char)*25 + sizeof(module));
-	sprintf(path, "modules/%s/lib%s.so.1", module, module);
+	fprintf(stdout, "/opt/efforia/services/%s.so\n", module);
+	sprintf(path, "/opt/efforia/services/%s.so", module);
 	handle = dlopen(path, RTLD_LAZY);
 	// Verify if the loading was successful
 	if (!handle) {
@@ -95,17 +79,20 @@ void start(const char* module, int max, char** buffer)
 	dlclose(handle);
 }
 
-void schedule(const char* module) {
+void schedule(const char* module)
+{
 	char** buffer;
 	int count, max;
 	char path[MAX_PATH_SIZE];
-	sprintf(path, "config/%s.json", module);
+	sprintf(path, "/opt/efforia/services/%s.cfg", module);
 	buffer = config(path, &max);
-	background();
-	// Start backend with config
-	if (buffer != NULL) start(module,max,buffer);
-	// Without configuration
-	else start(module,0,NULL);
+	pid_t service_id = fork();
+	if(service_id == 0){
+		// Start backend with config
+		if(buffer != NULL) start(module,max,buffer);
+		// Without configuration
+		else start(module,0,NULL);
+	}
 }
 
 void background()
@@ -118,7 +105,7 @@ void background()
 
 	// Exitting parent process
 	if (process_id > 0) {
-		printf("Started Efforia Core %s: %d\n", VERSION, process_id);
+		fprintf(stdout,"Started Efforia Core %s: %d\n", VERSION, process_id);
 		exit(EXIT_SUCCESS);
 	}
 	// Prepare the system to start the daemon
@@ -130,7 +117,8 @@ void background()
 	close(STDERR_FILENO);
 }
 
-int dashboard() {
+int dashboard()
+{
 	app_id = fork();
 	if (app_id == 0)
 		execv(DASHBOARD_PATH,NULL);
@@ -151,13 +139,23 @@ int main (int argc, char** argv)
 		strcpy(app,apps.modules[0]);
 		strcpy(app_type,apps.modules[1]);
 	}
+	int last = backends.n_modules - 1;
+	backends.modules[last] = NULL;
+	backends.n_modules--;
 	for (count = 0; count < backends.n_modules; count++)
 		schedule(backends.modules[count]);
 	free(r);
+
+	char path[128];
+	FILE *f = popen(HDMISTATUS_COMMAND_PATH, "r");
+    fgets(path, sizeof(path)-1, f);
+    if(strstr(path,"NTSC") || strstr(path,"PAL")){
+		fprintf(stdout,"Running in headless mode.\n");
+        exit(EXIT_SUCCESS);
+    }
 	dashboard();
 
 	// Open the file log and start the background service loop
-	FILE* f;
 	background();
 	char executable[MAX_BUFFER];
   	while(LOOP) {
