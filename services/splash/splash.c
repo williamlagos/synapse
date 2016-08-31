@@ -16,7 +16,7 @@ void centralize_img(SDL_Texture* img, SDL_Rect* texr, SDL_Window* win)
     texr->y = (win_h - h) / 2;
 }
 
-int start (int max, char** buffer)
+void start(int max, char** buffer)
 {
     SDL_Window* win = NULL;
     SDL_Texture* img = NULL;
@@ -50,6 +50,10 @@ int start (int max, char** buffer)
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);
     SDL_Quit();
+}
 
-    return 0;
+int main(int argc, char** argv)
+{
+    start(argc,argv);
+    return EXIT_SUCCESS;
 }
