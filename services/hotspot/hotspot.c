@@ -5,7 +5,7 @@
 
 #include "hotspot.h"
 
-int main (int argc, char *argv[])
+void start (int max, char **buffer)
 {
 	NMClient *client;
 	GError *error = NULL;
@@ -16,11 +16,16 @@ int main (int argc, char *argv[])
 	int connected = NOT_CONNECTED;
 
 	d = 0;
+	/* Verify if file lock exists */
+	if (access("/tmp/hotspot.lock",F_OK) == 0) {
+		fprintf(stdout,"Warning: Hotspot is locked. If isn't, remove /tmp/hotspot.lock.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	if (!(client = nm_client_new (NULL, &error))) {
 		g_message ("Error: Could not connect to NetworkManager: %s.", error->message);
 		g_error_free (error);
-		return EXIT_FAILURE;
+		exit(EXIT_FAILURE);
 	}
 
 	/* Now the connections can be listed. */
@@ -58,9 +63,10 @@ int main (int argc, char *argv[])
 	// Verify if there is any known connection
 	if(!connected){
 		// If not, start Hotspot service
-		// fputs("Start Hotspot\n",stdout);
 		system("systemctl stop NetworkManager");
-		pid_t hotspot_id = fork();
+		system("systemctl start create_ap");
+		// fputs("Start Hotspot\n",stdout);
+		/* pid_t hotspot_id = fork();
 		if(hotspot_id == 0) system("create_ap --no-virt wlan0 eth0 Hubspot hub12345");
 		else {
 			FILE *f = fopen("/tmp/hotspot.lock","w");
@@ -68,8 +74,12 @@ int main (int argc, char *argv[])
 			fprintf(stdout,"PID: %d",hotspot_id);
 			fclose(f);
 			exit(EXIT_SUCCESS);
-		}
+		} */
 	}
+}
 
+int main(int argc, char** argv)
+{
+	start(argc,argv);
 	return EXIT_SUCCESS;
 }
