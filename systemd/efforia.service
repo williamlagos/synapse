@@ -1,0 +1,10 @@
+[Unit]
+Description=Starts Efforia Core
+After=syslog.target
+
+[Service]
+Type=simple
+execStart=/opt/efforia/efforia
+
+[Install]
+WantedBy=multi-user.target
