@@ -83,10 +83,13 @@ void background()
 
 void dashboard()
 {
-	char executable[MAX_BUFFER];
-	fprintf(stdout,"Started Dashboard: %d",app_id);
-	sprintf(executable,"%s &",DASHBOARD_PATH);
-	system(executable);
+	//char executable[MAX_BUFFER];
+	//sprintf(executable,"%s &",DASHBOARD_PATH);
+	app_id = fork();
+	if(app_id == 0){
+		fprintf(stdout,"Started Dashboard: %d",app_id);
+		execv(DASHBOARD_PATH,NULL);
+	}
 	//sprintf(executable,"%s event",CORONAE_PATH);
 	//system(executable);
 }
