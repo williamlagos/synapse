@@ -1,5 +1,4 @@
 #include<stdio.h>
-#include<dlfcn.h>
 #include<stdlib.h>
 #include<unistd.h>
 #include<string.h>
@@ -53,46 +52,11 @@ void modules(const char* filename, Config* relations)
 	}
 }
 
-void start(const char* module, int max, char** buffer)
-{
-	char* error;
-	void* handle;
-	char path[128];
-	void (*function)(int,char**);
-	// Prepare the module string path and open library
-	fprintf(stdout, "/opt/efforia/services/%s.so\n", module);
-	sprintf(path, "/opt/efforia/services/%s.so", module);
-	handle = dlopen(path, RTLD_LAZY);
-	// Verify if the loading was successful
-	if (!handle) {
-		fputs(dlerror(), stderr);
-		exit(EXIT_FAILURE);
-	}
-	// Load the specified function in the module
-	function = dlsym(handle, "start");
-	if ((error = dlerror()) != NULL) {
-		fputs(error, stderr);
-		exit(EXIT_FAILURE);
-	}
-	// Execute the function, then close the module
-	function(max,buffer);
-	dlclose(handle);
-}
-
 void schedule(const char* module)
 {
-	char** buffer;
-	int count, max;
-	char path[MAX_PATH_SIZE];
-	sprintf(path, "/opt/efforia/services/%s.cfg", module);
-	buffer = config(path, &max);
-	pid_t service_id = fork();
-	if(service_id == 0){
-		// Start backend with config
-		if(buffer != NULL) start(module,max,buffer);
-		// Without configuration
-		else start(module,0,NULL);
-	}
+	char executable[MAX_BUFFER];
+	sprintf(executable,"%s %s",CORONAE_PATH,module);
+	system(executable);
 }
 
 void background()
@@ -117,17 +81,20 @@ void background()
 	close(STDERR_FILENO);
 }
 
-int dashboard()
+void dashboard()
 {
-	app_id = fork();
-	if (app_id == 0)
-		execv(DASHBOARD_PATH,NULL);
-	return app_id;
+	char executable[MAX_BUFFER];
+	fprintf(stdout,"Started Dashboard: %d",app_id);
+	sprintf(executable,"%s &",DASHBOARD_PATH);
+	system(executable);
+	//sprintf(executable,"%s event",CORONAE_PATH);
+	//system(executable);
 }
 
 int main (int argc, char** argv)
 {
 	int count;
+	int video = AV;
 	char app[64], app_type[64];
 	Config apps, backends, *r;
 	r = (Config*) malloc(sizeof(Config) * MAX_TYPES);
@@ -142,27 +109,40 @@ int main (int argc, char** argv)
 	int last = backends.n_modules - 1;
 	backends.modules[last] = NULL;
 	backends.n_modules--;
-	for (count = 0; count < backends.n_modules; count++)
-		schedule(backends.modules[count]);
+	for (count = 0; count < backends.n_modules; count++){
+		char* backend = backends.modules[count];
+		if(strstr(backend,"stream")) video = HDMI;
+		schedule(backend);
+	}
+
 	free(r);
 
-	char path[128];
-	FILE *f = popen(HDMISTATUS_COMMAND_PATH, "r");
-    fgets(path, sizeof(path)-1, f);
-    if(strstr(path,"NTSC") || strstr(path,"PAL")){
-		fprintf(stdout,"Running in headless mode.\n");
-        exit(EXIT_SUCCESS);
-    }
-	dashboard();
+	if(video == HDMI){
+		char path[128];
+		FILE *f = popen(HDMISTATUS_COMMAND_PATH, "r");
+		fgets(path, sizeof(path)-1, f);
+		if(strstr(path,"NTSC") || strstr(path,"PAL")){
+			fprintf(stdout,"Running in headless mode.\n");
+			exit(EXIT_SUCCESS);
+		}
+	}
+
+	if(strcmp(app,"dashboard") == 0) dashboard();
+	else {
+			char executable[128];
+			sprintf(executable,"/opt/efforia/applications/%s",app);
+			system(executable);
+			system("shutdown -h now");
+	}
 
 	// Open the file log and start the background service loop
-	background();
+	//background();
 	char executable[MAX_BUFFER];
   	while(LOOP) {
     	sleep(1);
 		if(access(DEFAULT_SWITCHER_PATH,F_OK) != -1) {
 			kill(app_id,SIGTERM);
-			f = fopen(DEFAULT_SWITCHER_PATH,"r");
+			FILE *f = fopen(DEFAULT_SWITCHER_PATH,"r");
 			fgets(executable,sizeof(executable),f);
 			fclose(f);
 			remove(DEFAULT_SWITCHER_PATH);

@@ -45,11 +45,11 @@ void start(int max, char** buffer)
     char guid_str[1024];
     SDL_JoystickGUID guid = SDL_JoystickGetGUID(js);
     SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
-    // const char* name = SDL_JoystickName(js);
+    const char* name = SDL_JoystickName(js);
 
-    // int axes = SDL_JoystickNumAxes(js);
+    int axes = SDL_JoystickNumAxes(js);
     int hats = SDL_JoystickNumHats(js);
-    // int balls = SDL_JoystickNumBalls(js);
+    int balls = SDL_JoystickNumBalls(js);
     int buttons = SDL_JoystickNumButtons(js);
 
     if(buttons < 2){
@@ -62,8 +62,8 @@ void start(int max, char** buffer)
         exit(EXIT_FAILURE);
     }
 
-    /* fprintf(stdout,"%s \"%s\" axes:%d buttons:%d hats:%d balls:%d\n",
-               guid_str, name, axes, buttons, hats, balls); */
+    fprintf(stdout,"%s \"%s\" axes:%d buttons:%d hats:%d balls:%d\n",
+               guid_str, name, axes, buttons, hats, balls);
     while(LOOP){
         while(SDL_PollEvent(&event)){
             switch(event.type){
