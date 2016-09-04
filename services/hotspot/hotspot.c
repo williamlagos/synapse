@@ -59,7 +59,12 @@ void start (int max, char **buffer)
 	}
 
 	g_object_unref (client);
-
+	
+	if(d == 0){
+		fprintf(stdout,"No Wi-Fi devices were found.\n");
+		exit(EXIT_FAILURE);
+	}
+	
 	// Verify if there is any known connection
 	if(!connected){
 		// If not, start Hotspot service
