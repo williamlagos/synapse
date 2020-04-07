@@ -5,7 +5,7 @@
 #include<signal.h>
 #include<sys/stat.h>
 #include<sys/types.h>
-#include "efforia.h"
+#include "schedule.h"
 
 pid_t app_id = 0;
 

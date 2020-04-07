@@ -6,7 +6,7 @@
 #define MAX_PATH_SIZE 64
 #define MAX_BUFFER 128
 
-char** config(const char* filename, int* cnt)
+/*char** config(const char* filename, int* cnt)
 {
 	int count = (*cnt);
 	char **lines;
@@ -21,7 +21,7 @@ char** config(const char* filename, int* cnt)
 	fclose(f);
 	(*cnt) = count;
 	return lines;
-}
+}*/
 
 void start(const char* module, int max, char** buffer)
 {
@@ -48,7 +48,7 @@ void start(const char* module, int max, char** buffer)
 	dlclose(handle);
 }
 
-int main(int argc, char** argv)
+/*int main(int argc, char** argv)
 {
     if(argc < 2) exit(EXIT_FAILURE);
     char* module = argv[1];
@@ -66,4 +66,4 @@ int main(int argc, char** argv)
 	}
 	fprintf(stdout,"Started service %s: %d\n",module,service_id);
     return EXIT_SUCCESS;
-}
+}*/
