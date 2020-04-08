@@ -1,5 +1,5 @@
 project(eos)
 cmake_minimum_required(VERSION 3.17)
 include_directories(include/)
-add_executable(eos src/schedule.c src/context.c)
-target_link_libraries(eos ${CMAKE_DL_LIBS})
+add_executable(eos src/schedule.c)
+target_link_libraries(eos)

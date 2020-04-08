@@ -6,7 +6,7 @@
 #define MAX_PATH_SIZE 64
 #define MAX_BUFFER 128
 
-/*char** config(const char* filename, int* cnt)
+char** config(const char* filename, int* cnt)
 {
 	int count = (*cnt);
 	char **lines;
@@ -21,7 +21,7 @@
 	fclose(f);
 	(*cnt) = count;
 	return lines;
-}*/
+}
 
 void start(const char* module, int max, char** buffer)
 {
@@ -30,7 +30,7 @@ void start(const char* module, int max, char** buffer)
 	char path[128];
 	void (*function)(int,char**);
 	// Prepare the module string path and open library
-	sprintf(path, "/opt/efforia/services/%s.so", module);
+	sprintf(path, "./%s.so", module);
 	handle = dlopen(path, RTLD_LAZY);
 	// Verify if the loading was successful
 	if (!handle) {
@@ -48,14 +48,14 @@ void start(const char* module, int max, char** buffer)
 	dlclose(handle);
 }
 
-/*int main(int argc, char** argv)
+int main(int argc, char** argv)
 {
     if(argc < 2) exit(EXIT_FAILURE);
     char* module = argv[1];
     char** buffer;
 	int max;
 	char path[MAX_PATH_SIZE];
-	sprintf(path, "/opt/efforia/services/%s.cfg", module);
+	sprintf(path, "./%s.cfg", module);
 	buffer = config(path, &max);
 	pid_t service_id = fork();
 	if(service_id == 0){
@@ -66,4 +66,4 @@ void start(const char* module, int max, char** buffer)
 	}
 	fprintf(stdout,"Started service %s: %d\n",module,service_id);
     return EXIT_SUCCESS;
-}*/
+}
