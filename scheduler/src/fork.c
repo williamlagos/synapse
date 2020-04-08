@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// #include <unistd.h>
 #include <uv.h>
 
 #define FIB_UNTIL 10
@@ -44,7 +45,7 @@ void after_fib(uv_work_t *req, int status) {
 typedef void (*init_plugin_function)();
 
 void dyn(uv_work_t *req_dyn) {
-    char* module = malloc(sizeof(req_dyn->data));
+    char* module = malloc(strlen(req_dyn->data));
     strcpy(module, req_dyn->data);
     uv_lib_t *lib = (uv_lib_t*) malloc(sizeof(uv_lib_t));
 
@@ -63,11 +64,14 @@ void dyn(uv_work_t *req_dyn) {
         }
 
         init_plugin();
+        uv_dlclose(lib);
+        free(lib);
     // }
 }
 
 void after_dyn(uv_work_t *req, int status) {
-    fprintf(stderr, "Done loading %sth\n", *(char *) req->data);
+    fprintf(stderr, "Done loading %s\n", (char *) req->data);
+    free(req);
 }
 
 void signal_handler(uv_signal_t *req, int signum)
@@ -98,27 +102,27 @@ int main(int argc, char** argv) {
     loop = uv_default_loop();
 
 
-    uv_timer_t timer_req;
+    /*uv_timer_t timer_req;
 
     uv_timer_init(loop, &timer_req);
-    uv_timer_start(&timer_req, callback, 5000, 2000);
+    uv_timer_start(&timer_req, callback, 5000, 2000);*/
 
 
-    if (argc == 1) {
+    /*if (argc == 1) {
         fprintf(stderr, "Usage: %s [plugin1] [plugin2] ...\n", argv[0]);
         // return 0;
     } else {
         dyn_req = malloc(sizeof(uv_work_t));
-        char* data = malloc(sizeof(argv[1]));
+        char* data = malloc(strlen(argv[1]));
         // char data[20];
         strcpy(data, argv[1]);
         dyn_req->data = (void*) data;
-        fprintf(stdout,"Opening thread for %s\n", data);
+        // fprintf(stdout,"Opening thread for %s\n", data);
         fprintf(stdout,"Opening thread for %s\n", (char*) dyn_req->data);
     
         uv_queue_work(loop, &dyn_req[0], dyn, after_dyn);
         
-    }
+    }*/
 
 
     int data[FIB_UNTIL];
@@ -148,9 +152,9 @@ int main(int argc, char** argv) {
     }
 
 
-    uv_signal_t sig;
+    /*uv_signal_t sig;
     uv_signal_init(loop, &sig);
-    uv_signal_start(&sig, signal_handler, SIGINT);
+    uv_signal_start(&sig, signal_handler, SIGINT);*/
 
     uv_idle_t idler;
 
@@ -159,5 +163,5 @@ int main(int argc, char** argv) {
 
     printf("Idling...\n");
 
-    return uv_run(loop, UV_RUN_DEFAULT);
+    return uv_run(loop, UV_RUN_DEFAULT);;
 }
