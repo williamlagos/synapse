@@ -1,4 +1,7 @@
 #!/usr/bin/python2
+# 
+# When running on bash:
+# /opt/scripts/key-rebind.py
 import subprocess,os,time
 import pyudev as udev
 

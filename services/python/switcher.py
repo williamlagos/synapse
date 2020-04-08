@@ -1,4 +1,7 @@
 #!/usr/bin/python
+# When running in bash:
+# /opt/scripts/switcher.py $1
+
 import time,subprocess,sys,os
 
 FNULL = open(os.devnull,'w')

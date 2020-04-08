@@ -1,5 +1,11 @@
 #!/usr/bin/python
 
+# When running on bash:
+# chroot /opt/$1 /launch
+# chroot /opt/web /browser start
+# chroot /opt/x11 startx 
+# chroot /opt/x11 xinit /etc/X11/xinit/xinitrc
+
 # from subprocess import Popen
 # from optparse import OptionParser
 import subprocess,os,sys

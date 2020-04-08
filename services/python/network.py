@@ -1,4 +1,7 @@
 #!/usr/bin/python
+#
+# When running in bash:
+# /opt/scripts/network.py
 import subprocess,os
 import NetworkManager
 

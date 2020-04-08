@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # Gamepad code integration to Kodi event server
 #
+# When running on bash:
+# /opt/scripts/gamepad.py 
+
 # For testing compatibility for PyGame SDL2
 # import pygame_sdl2 as pygame
 
