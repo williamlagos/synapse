@@ -7,7 +7,7 @@
             "label": "First CMake",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceRoot}/client"
+                "cwd": "${workspaceRoot}/"
             },
             "command": "cmake ."
         },
@@ -15,7 +15,7 @@
             "label": "Make",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceRoot}/client"
+                "cwd": "${workspaceRoot}/"
             },
             "command": "make"
         },

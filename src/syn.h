@@ -1,14 +1,17 @@
 #ifndef SYN_H
 #define SYN_H
 
-#include<dlfcn.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<string.h>
-#include<signal.h>
-#include<sys/stat.h>
-#include<sys/types.h>
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <signal.h>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include <uv.h>
 
 #define AV 0
 #define HDMI 1
@@ -29,6 +32,22 @@ typedef struct {
 	char* modules[MAX_MODULES];
 	int n_modules;
 } Config;
+
+uv_loop_t *loop;
+uv_process_t child_req;
+uv_process_options_t options;
+
+int64_t counter;
+
+typedef void (*init_plugin_function)();
+
+void cycle();
+void idle(uv_idle_t* handle);
+void async_start_sensor(uv_work_t *req_dyn);
+void async_stop_sensor(uv_work_t *req, int status);
+
+void async_start_process();
+void async_end_process(uv_process_t *req, int64_t exit_status, int term_signal);
 
 char** config(const char* filename, int* cnt);
 void modules(const char* filename, Config* relations);

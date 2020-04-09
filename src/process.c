@@ -87,6 +87,32 @@ void dashboard()
 	//system(executable);
 }
 
+void async_end_process(uv_process_t *req, int64_t exit_status, int term_signal) 
+{
+    fprintf(stderr, "Process exited with status %d, signal %d\n", (int) exit_status, term_signal);
+    uv_close((uv_handle_t*) req, NULL);
+}
+
+void async_start_process() 
+{
+	char* args[3];
+    args[0] = "mkdir";
+    args[1] = "test-dir";
+    args[2] = NULL;
+
+    options.exit_cb = async_end_process;
+    options.file = "mkdir";
+    options.args = args;
+
+    int r;
+    if ((r = uv_spawn(loop, &child_req, &options))) {
+        fprintf(stderr, "%s\n", uv_strerror(r));
+        return;
+    } else {
+        fprintf(stderr, "Launched process with ID %d\n", child_req.pid);
+    }
+}
+
 int process(int argc, char** argv)
 {
 	int count;

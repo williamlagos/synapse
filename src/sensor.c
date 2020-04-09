@@ -45,6 +45,47 @@ void start(const char* module, int max, char** buffer)
 	dlclose(handle);
 }
 
+void idle(uv_idle_t* handle) {
+    counter++;
+
+    if (counter >= 10e6)
+        uv_idle_stop(handle);
+}
+
+void cycle() {
+    fprintf(stdout, "Hello World!");
+}
+
+void async_start_sensor(uv_work_t *req_dyn) {
+    char* module = malloc(strlen(req_dyn->data));
+    strcpy(module, req_dyn->data);
+    uv_lib_t *lib = (uv_lib_t*) malloc(sizeof(uv_lib_t));
+
+    // while (--argc) {
+    fprintf(stdout,"Opened thread for %s\n", module);
+    fprintf(stderr, "Loading %s\n", module);
+    if (uv_dlopen(module, lib)) {
+        fprintf(stderr, "Error: %s\n", uv_dlerror(lib));
+        // continue;
+    }
+
+    init_plugin_function init_plugin;
+    if (uv_dlsym(lib, "start", (void **) &init_plugin)) {
+        fprintf(stderr, "dlsym error: %s\n", uv_dlerror(lib));
+        // continue;
+    }
+
+    init_plugin();
+    uv_dlclose(lib);
+    free(lib);
+    // }
+}
+
+void async_stop_sensor(uv_work_t *req, int status) {
+    fprintf(stderr, "Done loading %s\n", (char *) req->data);
+    free(req);
+}
+
 int sensor(int argc, char** argv)
 {
     if(argc < 2) exit(EXIT_FAILURE);
