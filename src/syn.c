@@ -38,7 +38,7 @@ void signal_handler(uv_signal_t *req, int signum)
     uv_signal_stop(req);
 }
 
-int main(int argc, char** argv) {
+int event_loop(int argc, char** argv) {
     loop = uv_default_loop();
 
     /*uv_timer_t timer_req;
@@ -82,4 +82,8 @@ int main(int argc, char** argv) {
     printf("Idling...\n");
 
     return uv_run(loop, UV_RUN_DEFAULT);;
+}
+
+int main(int argc, char** argv) {
+    return event_loop(argc, argv);
 }
