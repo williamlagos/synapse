@@ -70,5 +70,5 @@ void async_start_sensor(uv_work_t *req_dyn)
 
 void async_stop_sensor(uv_work_t *req, int status) {
     fprintf(stderr, "Done loading %s\n", (char *) req->data);
-	event_cycle((uv_req_t*) req);
+	sensor_event_cycle((uv_req_t*) req);
 }

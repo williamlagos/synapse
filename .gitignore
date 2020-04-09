@@ -65,7 +65,7 @@ CTestTestfile.cmake
 _deps
 
 eos
-
 efforia
+synapse
 *.so*
 *.o
