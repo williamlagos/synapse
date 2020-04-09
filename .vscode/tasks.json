@@ -1,0 +1,34 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "First CMake",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/client"
+            },
+            "command": "cmake ."
+        },
+        {
+            "label": "Make",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/client"
+            },
+            "command": "make"
+        },
+        {
+            "label": "Build",
+            "dependsOn": [
+                "First CMake",
+                "Make"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

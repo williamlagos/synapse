@@ -1,5 +1,5 @@
-#ifndef EFFORIA_H
-#define EFFORIA_H
+#ifndef SYN_H
+#define SYN_H
 
 #define AV 0
 #define HDMI 1
@@ -28,4 +28,4 @@ void schedule(const char* module);
 void background();
 void dashboard();
 
-#endif
+#endif /* SYN_H */

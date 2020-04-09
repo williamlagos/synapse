@@ -5,12 +5,13 @@
 #include<signal.h>
 #include<sys/stat.h>
 #include<sys/types.h>
-#include "schedule.h"
+
+#include "syn.h"
 
 pid_t app_id = 0;
 
 // Read configuration file and return lines buffer to manipulate
-char** config(const char* filename, int* cnt)
+/*char** config(const char* filename, int* cnt)
 {
 	int count = (*cnt);
 	char **lines;
@@ -25,7 +26,7 @@ char** config(const char* filename, int* cnt)
 	fclose(f);
 	(*cnt) = count;
 	return lines;
-}
+}*/
 
 // Read main configuration file and prepares list of modules to be used
 void modules(const char* filename, Config* relations)
@@ -94,7 +95,7 @@ void dashboard()
 	//system(executable);
 }
 
-int main (int argc, char** argv)
+int process(int argc, char** argv)
 {
 	int count;
 	int video = AV;

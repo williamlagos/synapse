@@ -3,6 +3,9 @@
 #include<unistd.h>
 #include<stdlib.h>
 #include<string.h>
+
+#include "syn.h"
+
 #define MAX_PATH_SIZE 64
 #define MAX_BUFFER 128
 
@@ -48,7 +51,7 @@ void start(const char* module, int max, char** buffer)
 	dlclose(handle);
 }
 
-int main(int argc, char** argv)
+int sensor(int argc, char** argv)
 {
     if(argc < 2) exit(EXIT_FAILURE);
     char* module = argv[1];

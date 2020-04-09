@@ -4,6 +4,8 @@
 // #include <unistd.h>
 #include <uv.h>
 
+#include "syn.h"
+
 #define FIB_UNTIL 10
 
 uv_loop_t *loop;
@@ -50,22 +52,22 @@ void dyn(uv_work_t *req_dyn) {
     uv_lib_t *lib = (uv_lib_t*) malloc(sizeof(uv_lib_t));
 
     // while (--argc) {
-        fprintf(stdout,"Opened thread for %s\n", module);
-        fprintf(stderr, "Loading %s\n", module);
-        if (uv_dlopen(module, lib)) {
-            fprintf(stderr, "Error: %s\n", uv_dlerror(lib));
-            // continue;
-        }
+    fprintf(stdout,"Opened thread for %s\n", module);
+    fprintf(stderr, "Loading %s\n", module);
+    if (uv_dlopen(module, lib)) {
+        fprintf(stderr, "Error: %s\n", uv_dlerror(lib));
+        // continue;
+    }
 
-        init_plugin_function init_plugin;
-        if (uv_dlsym(lib, "start", (void **) &init_plugin)) {
-            fprintf(stderr, "dlsym error: %s\n", uv_dlerror(lib));
-            // continue;
-        }
+    init_plugin_function init_plugin;
+    if (uv_dlsym(lib, "start", (void **) &init_plugin)) {
+        fprintf(stderr, "dlsym error: %s\n", uv_dlerror(lib));
+        // continue;
+    }
 
-        init_plugin();
-        uv_dlclose(lib);
-        free(lib);
+    init_plugin();
+    uv_dlclose(lib);
+    free(lib);
     // }
 }
 
