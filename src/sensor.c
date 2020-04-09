@@ -1,9 +1,3 @@
-#include<dlfcn.h>
-#include<stdio.h>
-#include<unistd.h>
-#include<stdlib.h>
-#include<string.h>
-
 #include "syn.h"
 
 #define MAX_PATH_SIZE 64

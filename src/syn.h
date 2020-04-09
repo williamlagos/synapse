@@ -1,6 +1,15 @@
 #ifndef SYN_H
 #define SYN_H
 
+#include<dlfcn.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<signal.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+
 #define AV 0
 #define HDMI 1
 #define LOOP 1
