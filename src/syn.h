@@ -36,15 +36,27 @@ typedef struct {
 	int n_sensors;
 } config_t;
 
-uv_loop_t *loop;
-uv_process_options_t options;
-uv_process_t child_req[MAX_PROCESS];
-config_t processes, sensors;
-config_t *r;
+typedef struct {
+	int status;
+	int worker_n;
+	char worker_name[64];
+} worker_t;
+
+typedef struct {
+	config_t config;
+	void* data;
+	int n_workers;
+	uv_work_t* workers;
+	uv_process_t main_process;
+	uv_process_options_t options;
+} context_t;
+
+context_t* contexts;
+uv_loop_t* loop;
 
 int64_t counter;
 
-typedef int (*init_sensor_function)();
+typedef int (*init_sensor_function)(int args, char** buffer);
 
 void cycle();
 void idle(uv_idle_t* handle);
@@ -52,16 +64,16 @@ void sensor_event_cycle(uv_req_t* req);
 void process_event_cycle(uv_handle_t* handle);
 
 void sync_start_sensor(const char* module, int max, char** buffer);
-void async_schedule_sensor(uv_work_t *req_dyn, char* module);
 void async_start_sensor(uv_work_t *req_dyn);
 void async_stop_sensor(uv_work_t *req, int status);
+void async_schedule_sensor(context_t* context, int i);
 
+void async_start_process(context_t* context, int i);
 void sync_start_process(char* process, char* process_args);
-void async_start_process(uv_process_t* child_req, char* process, char* process_args);
 void async_end_process(uv_process_t* child_req, int64_t exit_status, int term_signal);
 
 char** load_buffer(const char* filename, int* cnt);
-void load_config(const char* filename, config_t* relations, int n_relations);
+void load_config(const char* filename, context_t* contexts);
 void main_cycle();
 
 #endif /* SYN_H */

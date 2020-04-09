@@ -24,13 +24,13 @@ char** load_buffer(const char* filename, int* cnt)
 }
 
 // Read main configuration file and prepares list of modules to be used
-void load_config(const char* filename, config_t* relations, int n_relations)
+void load_config(const char* filename, context_t* contexts)
 {
 	int count, l, max;
 	char *key, *v, *value;
 	char **lines = load_buffer(filename, &max);
 	if (lines == NULL) exit(EXIT_FAILURE);
-    config_t* r = &relations[0];
+    config_t* r = &(contexts->config);
 	for (l = 0; l < max; l++) {
         // Checks for the name of the section then stores
 		if (strchr(lines[l], '[') != NULL) {
@@ -67,7 +67,7 @@ void load_config(const char* filename, config_t* relations, int n_relations)
             }   
             r->n_sensors = count;
             // Check if the configuration was already read, then go to another
-            if (r->command != NULL && r->name != NULL) r++;
+            if (r->command != NULL && r->name != NULL) r = &(++contexts)->config;
         }
 	}
 }
@@ -107,7 +107,8 @@ void signal_handler(uv_signal_t *req, int signum)
 
 void sensor_event_cycle(uv_req_t* req) {
     if (req->type == UV_WORK) {
-        if (atoi(req->data) == 20) {
+        worker_t* w = (worker_t*) req->data;
+        if (w->status == 20) {
 		    fprintf(stdout, "Thread Hello!\n");
             // Child process is blocking the loop
             // fprintf(stdout, "Command: %s %s starting\n", r[0].command, r[0].command_args);
@@ -121,7 +122,7 @@ void sensor_event_cycle(uv_req_t* req) {
 
 void process_event_cycle(uv_handle_t* handle) {
     if (handle->type == UV_PROCESS) {
-        if (atoi(handle->data) == 20) {
+        if (atoi(handle->data) == 0) {
             fprintf(stdout, "Fork Hello!\n");
         } else {
             fprintf(stdout, "Fork No.\n");
@@ -134,14 +135,31 @@ void process_event_cycle(uv_handle_t* handle) {
 
 void main_cycle() {
 	for (int i = 0; i < MAX_CONFIGS; i++) {
-        fprintf(stdout, "Starting configuration for %s...\n", r[i].name);
-        /*fprintf(stdout, "Command: %s %s starting\n", r[i].command, r[i].command_args);
-        child_req[i].data = (void*) "10";
-        async_start_process(&child_req[i], r[i].command, r[i].command_args);*/
-        for(int s = 0; s < r[i].n_sensors; s++) {
-            uv_work_t* dyn_req = malloc(sizeof(uv_work_t));
-            fprintf(stdout, "Sensor: %s activated\n", r[i].sensors[s]);
-            async_schedule_sensor(dyn_req, r[i].sensors[s]);
+        context_t* context = &contexts[i];
+        config_t* r = &(context->config);
+        fprintf(stdout, "Starting configuration for %s...\n", r->name);
+        context->n_workers = r->n_sensors;
+        if (context->workers == NULL) {
+            context->workers = calloc(sizeof(uv_work_t), context->n_workers);
+        }
+        for (int s = 0; s < r->n_sensors; s++) {
+            uv_work_t* worker_handle = (uv_work_t*) &(context->workers[s]);
+            if ((worker_t*) worker_handle->data == NULL) {
+                worker_t* worker = (worker_t*) malloc(sizeof(worker_t));
+                worker->status = -10;
+	            worker->worker_n = s;
+	            strcpy(worker->worker_name, context->config.sensors[s]);
+	            context->workers[s].data = (void*) worker;     
+            } else {
+                int status = ((worker_t*) worker_handle->data)->status;
+                fprintf(stdout, "Status worker: %d\n", status);
+                if (status == 20) {
+                    fprintf(stdout, "Condition met: command: %s %s starting\n", r->command, r->command_args);
+                    async_start_process(context, i);
+                }
+            }
+            fprintf(stdout, "Sensor: %s activated\n", r->sensors[s]);
+            async_schedule_sensor(context, s);
         }
 	}
 
@@ -169,8 +187,6 @@ int event_loop(int argc, char** argv) {
 
     printf("Idling...\n");
 
-	r = (config_t*) malloc(sizeof(config_t) * MAX_CONFIGS);
-	load_config(DEFAULT_CONFIGURATION_PATH, r, MAX_CONFIGS);
     uv_timer_t timer_req;
     uv_timer_init(loop, &timer_req);
     uv_timer_start(&timer_req, main_cycle, 5000, 2000);
@@ -179,6 +195,10 @@ int event_loop(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
+    contexts = (context_t*) calloc(sizeof(context_t), MAX_CONFIGS);
+    // config_t* c = (config_t*) malloc(sizeof(config_t) * MAX_CONFIGS);
+	load_config(DEFAULT_CONFIGURATION_PATH, contexts);/*, MAX_CONFIGS);*/
+
     /* Sensor main block:
     if(argc < 2) exit(EXIT_FAILURE);
     char* module = argv[1];

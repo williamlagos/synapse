@@ -37,22 +37,24 @@ void cycle() {
     fprintf(stdout, "Hello World!");
 }
 
-void async_schedule_sensor(uv_work_t *req_dyn, char* module) {
+void async_schedule_sensor(context_t* context, int i) {
 	// char path[128] ;
 	// Prepare the module string path and open library
 	// sprintf(path, "./%s", module);
-	req_dyn->data = (void*) module;
-    fprintf(stdout,"Opening thread for %s\n", (char*) req_dyn->data);
-    uv_queue_work(loop, &req_dyn[0], async_start_sensor, async_stop_sensor);
+	uv_work_t* w = (uv_work_t*) &(context->workers[i]);
+	worker_t* data = (worker_t*) w->data;
+    fprintf(stdout,"Opening thread for %s\n", data->worker_name);
+    uv_queue_work(loop, &(context->workers[i]), async_start_sensor, async_stop_sensor);
 }
 
 // Prepares to run module by dynamic loading
 void async_start_sensor(uv_work_t *req_dyn) 
 {
     uv_lib_t *lib = (uv_lib_t*) malloc(sizeof(uv_lib_t));
+	worker_t* d = (worker_t*) req_dyn->data;
 
 	// Dispatch error if the module can't be loaded:
-    if (uv_dlopen((char*)req_dyn->data, lib)) {
+    if (uv_dlopen(d->worker_name, lib)) {
 		fprintf(stderr, "Error: %s\n", uv_dlerror(lib));
 		return;
 	}
@@ -65,10 +67,13 @@ void async_start_sensor(uv_work_t *req_dyn)
 	}
 
 	// Loads function from module
-    sprintf((char*) req_dyn->data, "%d", sensor_init());
+    // sprintf((char*) req_dyn->data, "%d", sensor_init());
+	d->status = (int) sensor_init(0, NULL);
+	uv_dlclose(lib);
 }
 
 void async_stop_sensor(uv_work_t *req, int status) {
-    fprintf(stderr, "Done loading %s\n", (char *) req->data);
+	worker_t* w = (worker_t*) req->data;
+    fprintf(stderr, "Done loading %s, status: %d\n", w->worker_name, w->status);
 	sensor_event_cycle((uv_req_t*) req);
 }
