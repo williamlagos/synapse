@@ -1,26 +1,6 @@
 #include "syn.h"
 
-#define MAX_PATH_SIZE 64
-#define MAX_BUFFER 128
-
-char** config(const char* filename, int* cnt)
-{
-	int count = (*cnt);
-	char **lines;
-	char buffer[MAX_BUFFER];
-	FILE *f = fopen(filename, "r");
-	if (f == NULL) return NULL;
-	lines = (char**) calloc(sizeof(char*), MAX_BUFFER);
-	for (count = 0; fgets(buffer, sizeof(buffer), f); count++) {
-		lines[count] = (char*) malloc(sizeof(buffer));
-		strcpy(lines[count], buffer);
-	}
-	fclose(f);
-	(*cnt) = count;
-	return lines;
-}
-
-void start(const char* module, int max, char** buffer)
+void sync_start_sensor(const char* module, int max, char** buffer)
 {
 	char* error;
 	void* handle;
@@ -53,55 +33,33 @@ void idle(uv_idle_t* handle) {
 }
 
 void cycle() {
+	// TODO: Build logic for cycle requests
     fprintf(stdout, "Hello World!");
 }
 
-void async_start_sensor(uv_work_t *req_dyn) {
-    char* module = malloc(strlen(req_dyn->data));
-    strcpy(module, req_dyn->data);
+// Prepares to run module by dynamic loading
+void async_start_sensor(uv_work_t *req_dyn) 
+{
     uv_lib_t *lib = (uv_lib_t*) malloc(sizeof(uv_lib_t));
 
-    // while (--argc) {
-    fprintf(stdout,"Opened thread for %s\n", module);
-    fprintf(stderr, "Loading %s\n", module);
-    if (uv_dlopen(module, lib)) {
-        fprintf(stderr, "Error: %s\n", uv_dlerror(lib));
-        // continue;
-    }
+	// Dispatch error if the module can't be loaded:
+    if (uv_dlopen((char*)req_dyn->data, lib)) {
+		fprintf(stderr, "Error: %s\n", uv_dlerror(lib));
+		return;
+	}
 
-    init_plugin_function init_plugin;
-    if (uv_dlsym(lib, "start", (void **) &init_plugin)) {
-        fprintf(stderr, "dlsym error: %s\n", uv_dlerror(lib));
-        // continue;
-    }
+	// Loads function pointer with module, if doesn't, returns error
+    init_sensor_function sensor_init;
+    if (uv_dlsym(lib, "start", (void **) &sensor_init)) {
+		fprintf(stderr, "dlsym error: %s\n", uv_dlerror(lib));
+		return;
+	}
 
-    init_plugin();
-    uv_dlclose(lib);
-    free(lib);
-    // }
+	// Loads function from module
+    sensor_init();
 }
 
 void async_stop_sensor(uv_work_t *req, int status) {
     fprintf(stderr, "Done loading %s\n", (char *) req->data);
     free(req);
-}
-
-int sensor(int argc, char** argv)
-{
-    if(argc < 2) exit(EXIT_FAILURE);
-    char* module = argv[1];
-    char** buffer;
-	int max;
-	char path[MAX_PATH_SIZE];
-	sprintf(path, "./%s.cfg", module);
-	buffer = config(path, &max);
-	pid_t service_id = fork();
-	if(service_id == 0){
-		// Start backend with config
-		if(buffer != NULL) start(module,max,buffer);
-		// Without configuration
-		else start(module,0,NULL);
-	}
-	fprintf(stdout,"Started service %s: %d\n",module,service_id);
-    return EXIT_SUCCESS;
 }

@@ -17,43 +17,44 @@
 #define HDMI 1
 #define LOOP 1
 #define VERSION "0.1"
-#define MAX_TYPES 2
-#define MAX_MODULES 10
+#define MAX_CONFIGS 2
+#define MAX_SENSORS 8
+#define MAX_PROCESS 8
 #define MAX_BUFFER 128
 #define MAX_PATH_SIZE 64
-#define DEFAULT_CONFIGURATION_PATH "/opt/efforia/efforia.cfg"
+#define DEFAULT_CONFIGURATION_PATH "default.cfg"
 #define DEFAULT_SWITCHER_PATH "/tmp/eos.access"
 #define DASHBOARD_PATH "/usr/lib/kodi/kodi.bin"
 #define CORONAE_PATH "/opt/efforia/coronae"
 #define HDMISTATUS_COMMAND_PATH "/opt/vc/bin/tvservice -s"
 
 typedef struct {
-	char type[25];
-	char* modules[MAX_MODULES];
-	int n_modules;
-} Config;
+	char name[64];
+	char* command;
+	char* command_args;
+	char* sensors[MAX_SENSORS];
+	int n_sensors;
+} config_t;
 
 uv_loop_t *loop;
-uv_process_t child_req;
 uv_process_options_t options;
+uv_process_t child_req[MAX_PROCESS];
 
 int64_t counter;
 
-typedef void (*init_plugin_function)();
+typedef void (*init_sensor_function)();
 
 void cycle();
 void idle(uv_idle_t* handle);
+void sync_start_sensor(const char* module, int max, char** buffer);
 void async_start_sensor(uv_work_t *req_dyn);
 void async_stop_sensor(uv_work_t *req, int status);
 
-void async_start_process();
-void async_end_process(uv_process_t *req, int64_t exit_status, int term_signal);
+void sync_start_process(char* process, char* process_args);
+void async_start_process(uv_process_t* child_req, char* process, char* process_args);
+void async_end_process(uv_process_t* child_req, int64_t exit_status, int term_signal);
 
-char** config(const char* filename, int* cnt);
-void modules(const char* filename, Config* relations);
-void start(const char* module, int max, char** buffer);
-void schedule(const char* module);
-void background();
-void dashboard();
+char** load_buffer(const char* filename, int* cnt);
+void load_config(const char* filename, config_t* relations, int n_relations);
 
 #endif /* SYN_H */
