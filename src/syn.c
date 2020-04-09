@@ -2,7 +2,7 @@
 
 #define FIB_UNTIL 10
 
-uv_work_t* dyn_req;
+// uv_work_t dyn_req[4];
 uv_work_t req[FIB_UNTIL];
 
 // Read file and return lines buffer to manipulate
@@ -98,11 +98,30 @@ void signal_handler(uv_signal_t *req, int signum)
 {
     printf("Signal received!\n");
     int i;
-    uv_cancel((uv_req_t*) dyn_req);
+    // uv_cancel((uv_req_t*) dyn_req);
     for (i = 0; i < FIB_UNTIL; i++) {
         uv_cancel((uv_req_t*) &req[i]);
     }
     uv_signal_stop(req);
+}
+
+void event_cycle(uv_handle_t* handle) {
+    if (handle->type == UV_PROCESS) {
+        if (atoi(handle->data) == 20) {
+            fprintf(stdout, "Fork Hello!\n");
+        } else {
+            fprintf(stdout, "Fork No.\n");
+        }
+    } else if (handle->type == UV_ASYNC) {
+        if (atoi(handle->data) == 20) {
+		    fprintf(stdout, "Thread Hello!\n");
+        } else {
+            fprintf(stdout, "Thread No.\n");
+        }
+    }
+    
+    // uv_close((uv_handle_t*) handle, NULL);
+    // free(handle);
 }
 
 int event_loop(int argc, char** argv) {
@@ -112,22 +131,6 @@ int event_loop(int argc, char** argv) {
 
     uv_timer_init(loop, &timer_req);
     uv_timer_start(&timer_req, cycle, 5000, 2000);*/
-
-    if (argc == 1) {
-        fprintf(stderr, "Usage: %s [plugin1] [plugin2] ...\n", argv[0]);
-        // return 0;
-    } else {
-        dyn_req = malloc(sizeof(uv_work_t));
-        char* data = malloc(strlen(argv[1]));
-        // char data[20];
-        strcpy(data, argv[1]);
-        dyn_req->data = (void*) data;
-        // fprintf(stdout,"Opening thread for %s\n", data);
-        fprintf(stdout,"Opening thread for %s\n", (char*) dyn_req->data);
-    
-        uv_queue_work(loop, &dyn_req[0], async_start_sensor, async_stop_sensor);
-        
-    }
 
     int data[FIB_UNTIL];
     int i;
@@ -155,13 +158,29 @@ int event_loop(int argc, char** argv) {
 	for (int i = 0; i < MAX_CONFIGS; i++) {
         fprintf(stdout, "Starting configuration for %s...\n", r[i].name);
         fprintf(stdout, "Command: %s %s starting\n", r[i].command, r[i].command_args);
-        
+        child_req[i].data = (void*) "10";
         async_start_process(&child_req[i], r[i].command, r[i].command_args);
         for(int s = 0; s < r[i].n_sensors; s++) {
+            uv_work_t* dyn_req = malloc(sizeof(uv_work_t));
             fprintf(stdout, "Sensor: %s activated\n", r[i].sensors[s]);
-            // sync_start_process(r[i].sensors[s], NULL);
+            async_schedule_sensor(dyn_req, r[i].sensors[s]);
+
+            /*if (argc == 1) {
+            fprintf(stderr, "Usage: %s [plugin1] [plugin2] ...\n", argv[0]);
+                // return 0;
+            } else {
+                
+                char* data = malloc(strlen(argv[1]));
+                // char data[20];
+                strcpy(data, argv[1]);*/
+                
+                // fprintf(stdout,"Opening thread for %s\n", data);
+                
+            // }
         }
 	}
+
+
 
     return uv_run(loop, UV_RUN_DEFAULT);
 }

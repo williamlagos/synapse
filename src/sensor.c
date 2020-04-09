@@ -37,6 +37,15 @@ void cycle() {
     fprintf(stdout, "Hello World!");
 }
 
+void async_schedule_sensor(uv_work_t *req_dyn, char* module) {
+	// char path[128] ;
+	// Prepare the module string path and open library
+	// sprintf(path, "./%s", module);
+	req_dyn->data = (void*) module;
+    fprintf(stdout,"Opening thread for %s\n", (char*) req_dyn->data);
+    uv_queue_work(loop, &req_dyn[0], async_start_sensor, async_stop_sensor);
+}
+
 // Prepares to run module by dynamic loading
 void async_start_sensor(uv_work_t *req_dyn) 
 {
@@ -56,10 +65,10 @@ void async_start_sensor(uv_work_t *req_dyn)
 	}
 
 	// Loads function from module
-    sensor_init();
+    sprintf((char*) req_dyn->data, "%d", sensor_init());
 }
 
 void async_stop_sensor(uv_work_t *req, int status) {
     fprintf(stderr, "Done loading %s\n", (char *) req->data);
-    free(req);
+	event_cycle((uv_req_t*) req);
 }

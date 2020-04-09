@@ -46,7 +46,7 @@ void sync_start_process(char* process, char* process_args)
 void async_end_process(uv_process_t* child_req, int64_t exit_status, int term_signal) 
 {
     fprintf(stderr, "Process exited with status %d, signal %d\n", (int) exit_status, term_signal);
-    uv_close((uv_handle_t*) child_req, NULL);
+	event_cycle((uv_handle_t*) child_req);
 }
 
 void async_start_process(uv_process_t* child_req, 

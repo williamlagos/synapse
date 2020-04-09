@@ -4,7 +4,7 @@
 
 #define HDMISTATUS_COMMAND_PATH "/opt/vc/bin/tvservice -s"
 
-void start(int max, char** buffer)
+int start(int max, char** buffer)
 {
     char path[1035];
 
@@ -26,6 +26,7 @@ void start(int max, char** buffer)
     // fprintf(stdout,"%s", path);
     /* close */
     pclose(f);
+    return 20;
 }
 
 int main(int argc, char** argv)

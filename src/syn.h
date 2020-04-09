@@ -42,11 +42,14 @@ uv_process_t child_req[MAX_PROCESS];
 
 int64_t counter;
 
-typedef void (*init_sensor_function)();
+typedef int (*init_sensor_function)();
 
 void cycle();
 void idle(uv_idle_t* handle);
+void event_cycle(uv_handle_t* handle);
+
 void sync_start_sensor(const char* module, int max, char** buffer);
+void async_schedule_sensor(uv_work_t *req_dyn, char* module);
 void async_start_sensor(uv_work_t *req_dyn);
 void async_stop_sensor(uv_work_t *req, int status);
 
