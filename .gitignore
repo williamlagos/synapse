@@ -69,3 +69,4 @@ efforia
 synapse
 *.so*
 *.o
+*.file

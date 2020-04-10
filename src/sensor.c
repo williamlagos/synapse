@@ -32,15 +32,8 @@ void idle(uv_idle_t* handle) {
         uv_idle_stop(handle);
 }
 
-void cycle() {
-	// TODO: Build logic for cycle requests
-    fprintf(stdout, "Hello World!");
-}
-
 void async_schedule_sensor(context_t* context, int i) {
-	// char path[128] ;
 	// Prepare the module string path and open library
-	// sprintf(path, "./%s", module);
 	uv_work_t* w = (uv_work_t*) &(context->workers[i]);
 	worker_t* data = (worker_t*) w->data;
     fprintf(stdout,"Opening thread for %s\n", data->worker_name);

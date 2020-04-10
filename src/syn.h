@@ -72,8 +72,6 @@ void async_start_process(context_t* context, int i);
 void sync_start_process(char* process, char* process_args);
 void async_end_process(uv_process_t* child_req, int64_t exit_status, int term_signal);
 
-char** load_buffer(const char* filename, int* cnt);
-void load_config(const char* filename, context_t* contexts);
 void main_cycle();
 
 #endif /* SYN_H */

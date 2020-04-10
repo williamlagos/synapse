@@ -1,125 +1,19 @@
-#include "syn.h"
+// #include "syn.h"
+#include "utils.h"
 
-#define FIB_UNTIL 10
-
-// uv_work_t dyn_req[4];
-uv_work_t req[FIB_UNTIL];
-
-// Read file and return lines buffer to manipulate
-char** load_buffer(const char* filename, int* cnt)
-{
-	int count = (*cnt);
-	char **lines;
-	char buffer[MAX_BUFFER];
-	FILE *f = fopen(filename, "r");
-	if (f == NULL) return NULL;
-	lines = (char**) calloc(sizeof(char*), MAX_BUFFER);
-	for (count = 0; fgets(buffer, sizeof(buffer), f); count++) {
-		lines[count] = (char*) malloc(sizeof(buffer));
-		strcpy(lines[count], buffer);
-	}
-	fclose(f);
-	(*cnt) = count;
-	return lines;
-}
-
-// Read main configuration file and prepares list of modules to be used
-void load_config(const char* filename, context_t* contexts)
-{
-	int count, l, max;
-	char *key, *v, *value;
-	char **lines = load_buffer(filename, &max);
-	if (lines == NULL) exit(EXIT_FAILURE);
-    config_t* r = &(contexts->config);
-	for (l = 0; l < max; l++) {
-        // Checks for the name of the section then stores
-		if (strchr(lines[l], '[') != NULL) {
-            char* section = ++lines[l];
-            section[strlen(lines[l]) - strlen(strchr(lines[l], ']'))] = 0;
-            strcpy(r->name, section);
-            continue;
-        }
-
-        // Gets key and value from this line
-		key = strtok(lines[l], "=");
-		value = strtok(NULL, "=\n");
-
-        // Checks if the key is for command then stores
-        if (strcmp(key, "command") == 0) {
-            r->command = (char*) malloc(strlen(value));
-            strcpy(r->command, strtok(value, " "));
-            size_t command_size = strlen(r->command);
-            r->command_args = (char*) malloc(strlen(value) - command_size);
-            strcpy(r->command_args, strtok(NULL, " "));
-            while((v = strtok(NULL, " ")) != NULL) sprintf(r->command_args, "%s %s", r->command_args, v);
-            continue;
-        }
-
-        // Checks if the key is for command then stores
-        if (strcmp(key, "sensors") == 0) {
-            count = 0;
-            v = strtok(value, ",");
-            while (v != NULL) {
-                r->sensors[count] = (char*) malloc(sizeof(v));
-                strcpy(r->sensors[count], v);
-                v = strtok(NULL, ",");
-                count++;
-            }   
-            r->n_sensors = count;
-            // Check if the configuration was already read, then go to another
-            if (r->command != NULL && r->name != NULL) r = &(++contexts)->config;
-        }
-	}
-}
-
-void start_fib(uv_work_t *req) {
-    int n = *(int *) req->data;
-    if (random() % 2)
-        uv_sleep(1);
-    else
-        uv_sleep(3);
-    // long fib = fib_(n);
-    int i, fib;
-    int a = 0;
-    int b = 1;
-    for(i = 0; i < n; i++) {
-        fib = a + b;
-        a = b;
-        b = fib;
-    }
-    fprintf(stderr, "%dth fibonacci is %lu\n", n, fib);
-}
-
-void stop_fib(uv_work_t *req, int status) {
-    fprintf(stderr, "Done calculating %dth fibonacci\n", *(int *) req->data);
-}
-
-void signal_handler(uv_signal_t *req, int signum)
-{
-    printf("Signal received!\n");
-    int i;
-    // uv_cancel((uv_req_t*) dyn_req);
-    for (i = 0; i < FIB_UNTIL; i++) {
-        uv_cancel((uv_req_t*) &req[i]);
-    }
-    uv_signal_stop(req);
-}
-
+// TODO: Make logics about finishing sensor cycle
 void sensor_event_cycle(uv_req_t* req) {
     if (req->type == UV_WORK) {
         worker_t* w = (worker_t*) req->data;
         if (w->status == 20) {
 		    fprintf(stdout, "Thread Hello!\n");
-            // Child process is blocking the loop
-            // fprintf(stdout, "Command: %s %s starting\n", r[0].command, r[0].command_args);
-            // child_req[0].data = (void*) "10";
-            // async_start_process(&child_req[0], r[0].command, r[0].command_args);
         } else {
             fprintf(stdout, "Thread No.\n");
         }
     }
 }
 
+// TODO: Make logics about finishing process cycle
 void process_event_cycle(uv_handle_t* handle) {
     if (handle->type == UV_PROCESS) {
         if (atoi(handle->data) == 0) {
@@ -128,9 +22,6 @@ void process_event_cycle(uv_handle_t* handle) {
             fprintf(stdout, "Fork No.\n");
         }
     }
-    
-    // uv_close((uv_handle_t*) handle, NULL);
-    // free(handle);
 }
 
 void main_cycle() {
@@ -153,6 +44,7 @@ void main_cycle() {
             } else {
                 int status = ((worker_t*) worker_handle->data)->status;
                 fprintf(stdout, "Status worker: %d\n", status);
+                // TODO: Make logics about conditional sensor / process cycle
                 if (status == 20) {
                     fprintf(stdout, "Condition met: command: %s %s starting\n", r->command, r->command_args);
                     async_start_process(context, i);
@@ -168,24 +60,16 @@ void main_cycle() {
 int event_loop(int argc, char** argv) {
     loop = uv_default_loop();
 
-    int data[FIB_UNTIL];
-    int i;
-    for (i = 0; i < FIB_UNTIL; i++) {
-        data[i] = i;
-        req[i].data = (void *) &data[i];
-        uv_queue_work(loop, &req[i], start_fib, stop_fib);
-    }
-
-    /*uv_signal_t sig;
+    uv_signal_t sig;
     uv_signal_init(loop, &sig);
-    uv_signal_start(&sig, signal_handler, SIGINT);*/
+    uv_signal_start(&sig, signal_handler, SIGINT);
+
+    fibonacci_cycle(loop);
 
     uv_idle_t idler;
     counter = 0;
     uv_idle_init(loop, &idler);
     uv_idle_start(&idler, idle);
-
-    printf("Idling...\n");
 
     uv_timer_t timer_req;
     uv_timer_init(loop, &timer_req);
