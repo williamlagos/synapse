@@ -13,9 +13,6 @@
 
 #include <uv.h>
 
-#define AV 0
-#define HDMI 1
-#define LOOP 1
 #define VERSION "0.1"
 #define MAX_CONFIGS 2
 #define MAX_SENSORS 8
@@ -23,10 +20,7 @@
 #define MAX_BUFFER 128
 #define MAX_PATH_SIZE 64
 #define DEFAULT_CONFIGURATION_PATH "default.cfg"
-#define DEFAULT_SWITCHER_PATH "/tmp/eos.access"
-#define DASHBOARD_PATH "/usr/lib/kodi/kodi.bin"
-#define CORONAE_PATH "/opt/efforia/coronae"
-#define HDMISTATUS_COMMAND_PATH "/opt/vc/bin/tvservice -s"
+#define DEFAULT_SWITCHER_PATH "/tmp/synapse.access"
 
 typedef struct {
 	char name[64];
@@ -58,20 +52,21 @@ int64_t counter;
 
 typedef int (*init_sensor_function)(int args, char** buffer);
 
-void cycle();
 void idle(uv_idle_t* handle);
 void sensor_event_cycle(uv_req_t* req);
 void process_event_cycle(uv_handle_t* handle);
 
-void sync_start_sensor(const char* module, int max, char** buffer);
 void async_start_sensor(uv_work_t *req_dyn);
 void async_stop_sensor(uv_work_t *req, int status);
 void async_schedule_sensor(context_t* context, int i);
 
 void async_start_process(context_t* context, int i);
-void sync_start_process(char* process, char* process_args);
 void async_end_process(uv_process_t* child_req, int64_t exit_status, int term_signal);
 
 void main_cycle();
+
+/* Old functions from synapse scheduler. To be deprecated and removed. */
+void sync_start_sensor(const char* module, int max, char** buffer);
+void sync_start_process(char* process, char* process_args);
 
 #endif /* SYN_H */
