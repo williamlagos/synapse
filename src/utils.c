@@ -79,7 +79,7 @@ void start_fib(uv_work_t *req) {
         a = b;
         b = fib;
     }
-    fprintf(stderr, "%dth fibonacci is %lu\n", n, fib);
+    fprintf(stderr, "%dth fibonacci is %d\n", n, fib);
 }
 
 void stop_fib(uv_work_t *req, int status) {
