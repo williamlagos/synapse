@@ -26,7 +26,6 @@ int start(int max, char** buffer)
     // fprintf(stdout,"%s", path);
     /* close */
     // pclose(f);*/
-    // fprintf(stdout, "Hello World!");
     return 20;
 }
 
