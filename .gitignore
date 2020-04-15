@@ -70,3 +70,4 @@ synapse
 *.so*
 *.o
 *.file
+sensor/stream/stream

@@ -28,6 +28,8 @@ typedef struct {
 	char name[64];
 	char* command;
 	char* command_args;
+	char* state;
+	char* state_args;
 	char* sensors[MAX_SENSORS];
 	int n_sensors;
 } config_t;

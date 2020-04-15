@@ -6,6 +6,7 @@
 
 int start(int max, char** buffer)
 {
+    int status = EXIT_SUCCESS;
     char path[1035];
 
     /* Open the command for reading. */
@@ -18,20 +19,20 @@ int start(int max, char** buffer)
     /* Read the output a line at a time - output it. */
     fgets(path, sizeof(path)-1, f);
     if(strstr(path,"NTSC") || strstr(path,"PAL")){
-        system("systemctl start minidlna");
+        /*system("systemctl start minidlna");
         system("systemctl start gmediarender");
-        system("systemctl start shairport-sync");
+        system("systemctl start shairport-sync");*/
+        status = EXIT_SUCCESS;
+    } else {
+        status = EXIT_FAILURE;
     }
 
-    fprintf(stdout,"%s", path);
-    /* close */
+    // fprintf(stdout,"%s", path);
     pclose(f);
-    fprintf(stdout, "Hello World!");
-    return 0;
+    return status;
 }
 
 int main(int argc, char** argv)
 {
-    start(argc,argv);
-    return EXIT_SUCCESS;
+    return start(argc,argv);
 }
