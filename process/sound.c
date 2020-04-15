@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+/* Transitory code, to be transformed into bash or python */
+
 void start(int max, char** buffer)
 {
 	//fprintf(stdout,"Activating PulseAudio...\n");

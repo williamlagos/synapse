@@ -22,11 +22,7 @@
  *   gcc -Wall `pkg-config --libs --cflags glib-2.0 libnm` handler.c -o handler
  */
 
-#include <glib.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "hotspot.h"
+#include "network.h"
 
 /* Print details of connection */
 void show_connection (NMConnection *connection)

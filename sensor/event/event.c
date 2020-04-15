@@ -29,7 +29,7 @@ void action(const char* message){
     sendto(s,buffer,BUFLEN,0,(struct sockaddr*)&address,address_length);
 }
 
-void start(int max, char** buffer)
+int start(int max, char** buffer)
 {
     int joysticks;
     SDL_Event event;
@@ -54,17 +54,17 @@ void start(int max, char** buffer)
 
     if(buttons < 2){
         fprintf(stdout,"There aren't enough buttons to control.\n");
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     if(hats == 0){
         fprintf(stdout,"There aren't any Hat to use to move.\n");
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     fprintf(stdout,"%s \"%s\" axes:%d buttons:%d hats:%d balls:%d\n",
                guid_str, name, axes, buttons, hats, balls);
-    while(LOOP){
+    /*while(LOOP){
         while(SDL_PollEvent(&event)){
             switch(event.type){
                 case SDL_JOYBUTTONDOWN:
@@ -79,13 +79,13 @@ void start(int max, char** buffer)
                     break;
             }
         }
-    }
+    }*/
     SDL_JoystickClose(js);
     SDL_Quit();
+    return EXIT_SUCCESS;
 }
 
 int main(int argc, char** argv)
 {
-    start(argc,argv);
-    return EXIT_SUCCESS;
+    return start(argc,argv);
 }

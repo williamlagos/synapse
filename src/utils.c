@@ -39,17 +39,6 @@ void load_config(const char* filename, context_t* contexts)
 		key = strtok(lines[l], "=");
 		value = strtok(NULL, "=\n");
 
-        // Checks if the key is for state check then stores
-        if (strcmp(key, "state") == 0) {
-            r->state = (char*) malloc(strlen(value));
-            strcpy(r->state, strtok(value, " "));
-            size_t state_size = strlen(r->state);
-            r->state_args = (char*) malloc(strlen(value) - state_size);
-            strcpy(r->state_args, strtok(NULL, " "));
-            while((v = strtok(NULL, " ")) != NULL) sprintf(r->state_args, "%s %s", r->state_args, v);
-            continue;
-        }
-
         // Checks if the key is for command then stores
         if (strcmp(key, "command") == 0) {
             r->command = (char*) malloc(strlen(value));

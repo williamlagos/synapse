@@ -6,6 +6,8 @@
 #define LOOP 1
 #define IMG_PATH "/boot/oemsplash.png"
 
+/* Transitory code, to be transformed into bash or python */
+
 void centralize_img(SDL_Texture* img, SDL_Rect* texr, SDL_Window* win)
 {
     int w, h, win_w, win_h;

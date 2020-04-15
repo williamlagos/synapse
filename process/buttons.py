@@ -50,12 +50,12 @@ def test():
     while True:
         buttons = get()
 	print buttons
-	#if buttons[0] < 0: subprocess.call(["kodi-send","--action=Left"])
-	#if buttons[0] > 0: subprocess.call(["kodi-send","--action=Right"])
-	#if buttons[1] < 0: subprocess.call(["kodi-send","--action=Up"])
-	#if buttons[1] > 0: subprocess.call(["kodi-send","--action=Down"])
-	#if buttons[5] > 0: subprocess.call(["kodi-send","--action=Back"])
-	#if buttons[6] > 0: subprocess.call(["kodi-send","--action=Select"])
+	if buttons[0] < 0: subprocess.call(["kodi-send","--action=Left"])
+	if buttons[0] > 0: subprocess.call(["kodi-send","--action=Right"])
+	if buttons[1] < 0: subprocess.call(["kodi-send","--action=Up"])
+	if buttons[1] > 0: subprocess.call(["kodi-send","--action=Down"])
+	if buttons[5] > 0: subprocess.call(["kodi-send","--action=Back"])
+	if buttons[6] > 0: subprocess.call(["kodi-send","--action=Select"])
 	time.sleep(1)
 
 if __name__ == "__main__": test()

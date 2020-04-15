@@ -25,11 +25,7 @@
  *   gcc -Wall `pkg-config --libs --cflags glib-2.0 libnm` get-ap-info-libnm.c -o get-ap-info-libnm
  */
 
-#include <glib.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "hotspot.h"
+#include "network.h"
 
 /* Convert flags to string */
 char * ap_wpa_rsn_flags_to_string (guint32 flags)

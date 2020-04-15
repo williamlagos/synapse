@@ -1,11 +1,9 @@
-#include <glib.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "network.h"
 
-#include "hotspot.h"
+/* cc:
+	gcc -Wall `pkg-config --libs --cflags glib-2.0 libnm` configurations.c connections.c hotspot.c -o hotspot */
 
-void start (int max, char **buffer)
+int start (int max, char **buffer)
 {
 	NMClient *client;
 	GError *error = NULL;
@@ -66,10 +64,12 @@ void start (int max, char **buffer)
 	}
 	
 	// Verify if there is any known connection
-	if(!connected){
+	if (!connected){
 		// If not, start Hotspot service
-		system("systemctl stop NetworkManager");
-		system("systemctl start create_ap");
+		/*system("systemctl stop NetworkManager");
+		system("systemctl start create_ap");*/
+		return EXIT_SUCCESS;
+		
 		// fputs("Start Hotspot\n",stdout);
 		/* pid_t hotspot_id = fork();
 		if(hotspot_id == 0) system("create_ap --no-virt wlan0 eth0 Hubspot hub12345");
@@ -80,11 +80,12 @@ void start (int max, char **buffer)
 			fclose(f);
 			exit(EXIT_SUCCESS);
 		} */
+	} else {
+		return EXIT_FAILURE;
 	}
 }
 
 int main(int argc, char** argv)
 {
-	start(argc,argv);
-	return EXIT_SUCCESS;
+	return start(argc,argv);
 }
