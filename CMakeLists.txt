@@ -19,5 +19,7 @@ target_link_libraries(event ${SDL2_LIBRARIES})
 
 add_library(stream SHARED sensor/stream/stream.c)
 
+add_library(impulse SHARED sensor/impulse/impulse.c)
+
 
 target_link_libraries(synapse uv)
