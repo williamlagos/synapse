@@ -4,27 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "First CMake",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceRoot}/"
-            },
-            "command": "cmake -DCMAKE_BUILD_TYPE=Debug ."
-        },
-        {
-            "label": "Make",
-            "type": "shell",
-            "options": {
-                "cwd": "${workspaceRoot}/"
-            },
-            "command": "make"
-        },
-        {
             "label": "Build",
-            "dependsOn": [
-                "First CMake",
-                "Make"
-            ],
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/"
+            },
+            "command": "cmake -DCMAKE_BUILD_TYPE=Debug . && make",
             "group": {
                 "kind": "build",
                 "isDefault": true

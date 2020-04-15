@@ -84,24 +84,6 @@ int main(int argc, char** argv) {
     contexts = (context_t*) calloc(sizeof(context_t), MAX_CONFIGS);
     // config_t* c = (config_t*) malloc(sizeof(config_t) * MAX_CONFIGS);
 	load_config(DEFAULT_CONFIGURATION_PATH, contexts);/*, MAX_CONFIGS);*/
-
-    /* Sensor main block:
-    if(argc < 2) exit(EXIT_FAILURE);
-    char* module = argv[1];
-    char** buffer;
-	int max;
-	char path[MAX_PATH_SIZE];
-	sprintf(path, "./%s.cfg", module);
-	buffer = config(path, &max);
-	pid_t service_id = fork();
-	if(service_id == 0){
-		// Start backend with config
-		if(buffer != NULL) start(module,max,buffer);
-		// Without configuration
-		else start(module,0,NULL);
-	}
-	fprintf(stdout,"Started service %s: %d\n",module,service_id);
-    return EXIT_SUCCESS; */
  
     /* Process main block:
     // int count;
@@ -151,6 +133,4 @@ int main(int argc, char** argv) {
   	return 0;*/
 
     return event_loop(argc, argv);
-
-    // return EXIT_SUCCESS;
 }
