@@ -45,9 +45,11 @@ void main_cycle() {
                 int status = ((worker_t*) worker_handle->data)->status;
                 fprintf(stdout, "Status worker: %d\n", status);
                 // TODO: Make logics about conditional sensor / process cycle
-                if (status == 20) {
+                if (status == SUCCESS_STATUS) {
                     fprintf(stdout, "Condition met: command: %s %s starting\n", r->command, r->command_args);
                     async_start_process(context, i);
+                } else if (status == FAILURE_STATUS) {
+                    fprintf(stderr, "Condition not met: command: %s %s not starting\n", r->command, r->command_args);
                 }
             }
             fprintf(stdout, "Sensor: %s activated\n", r->sensors[s]);

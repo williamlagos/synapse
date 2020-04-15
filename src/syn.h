@@ -19,6 +19,8 @@
 #define MAX_PROCESS 8
 #define MAX_BUFFER 128
 #define MAX_PATH_SIZE 64
+#define SUCCESS_STATUS 0 
+#define FAILURE_STATUS 1 
 #define DEFAULT_CONFIGURATION_PATH "default.cfg"
 #define DEFAULT_SWITCHER_PATH "/tmp/synapse.access"
 
