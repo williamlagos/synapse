@@ -1,30 +1,5 @@
 #include "syn.h"
 
-void sync_start_sensor(const char* module, int max, char** buffer)
-{
-	char* error;
-	void* handle;
-	char path[128];
-	void (*function)(int,char**);
-	// Prepare the module string path and open library
-	sprintf(path, "./%s.so", module);
-	handle = dlopen(path, RTLD_LAZY);
-	// Verify if the loading was successful
-	if (!handle) {
-		fputs(dlerror(), stderr);
-		exit(EXIT_FAILURE);
-	}
-	// Load the specified function in the module
-	function = dlsym(handle, "start");
-	if ((error = dlerror()) != NULL) {
-		fputs(error, stderr);
-		exit(EXIT_FAILURE);
-	}
-	// Execute the function, then close the module
-	function(max,buffer);
-	dlclose(handle);
-}
-
 void idle(uv_idle_t* handle) {
     counter++;
 
@@ -36,7 +11,7 @@ void async_schedule_sensor(context_t* context, int i) {
 	// Prepare the module string path and open library
 	uv_work_t* w = (uv_work_t*) &(context->workers[i]);
 	worker_t* data = (worker_t*) w->data;
-    fprintf(stdout,"Opening thread for %s\n", data->worker_name);
+    fprintf(stderr,"Opening thread for %s\n", data->worker_name);
     uv_queue_work(loop, &(context->workers[i]), async_start_sensor, async_stop_sensor);
 }
 
@@ -48,7 +23,7 @@ void async_start_sensor(uv_work_t *req_dyn)
 
 	// Dispatch error if the module can't be loaded:
     if (uv_dlopen(d->worker_name, lib)) {
-		fprintf(stderr, "Error: %s\n", uv_dlerror(lib));
+		fprintf(stderr, "error: %s\n", uv_dlerror(lib));
 		return;
 	}
 
@@ -61,12 +36,11 @@ void async_start_sensor(uv_work_t *req_dyn)
 
 	// Loads function from module
     // sprintf((char*) req_dyn->data, "%d", sensor_init());
-	d->status = (int) sensor_init(1, &d->worker_args);
+	d->status = (int) sensor_init(0, &d->worker_args);
 	uv_dlclose(lib);
 }
 
 void async_stop_sensor(uv_work_t *req, int status) {
 	worker_t* w = (worker_t*) req->data;
     fprintf(stderr, "Done loading %s, status: %d\n", w->worker_name, w->status);
-	sensor_event_cycle((uv_req_t*) req);
 }

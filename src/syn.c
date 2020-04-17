@@ -1,34 +1,11 @@
 // #include "syn.h"
 #include "utils.h"
 
-// TODO: Make logics about finishing sensor cycle
-void sensor_event_cycle(uv_req_t* req) {
-    if (req->type == UV_WORK) {
-        worker_t* w = (worker_t*) req->data;
-        if (w->status == 20) {
-		    fprintf(stdout, "Thread Hello!\n");
-        } else {
-            fprintf(stdout, "Thread No.\n");
-        }
-    }
-}
-
-// TODO: Make logics about finishing process cycle
-void process_event_cycle(uv_handle_t* handle) {
-    if (handle->type == UV_PROCESS) {
-        if (atoi(handle->data) == 0) {
-            fprintf(stdout, "Fork Hello!\n");
-        } else {
-            fprintf(stdout, "Fork No.\n");
-        }
-    }
-}
-
 void main_cycle() {
 	for (int i = 0; i < MAX_CONFIGS; i++) {
         context_t* context = &contexts[i];
         config_t* r = &(context->config);
-        fprintf(stdout, "Starting configuration for %s...\n", r->name);
+        fprintf(stderr, "Starting configuration for %s...\n", r->name);
         context->n_workers = r->n_sensors;
         if (context->workers == NULL) {
             context->workers = calloc(sizeof(uv_work_t), context->n_workers);
@@ -51,20 +28,27 @@ void main_cycle() {
 	            context->workers[s].data = (void*) worker;     
             } else {
                 int status = ((worker_t*) worker_handle->data)->status;
-                fprintf(stdout, "Status worker: %d\n", status);
-                // TODO: Make logics about conditional sensor / process cycle
+                fprintf(stderr, "Status worker: %d\n", status);
                 if (status == SUCCESS_STATUS) {
-                    fprintf(stdout, "Condition met: command: %s %s starting\n", r->command, r->command_args);
+                    fprintf(stderr, "Condition met: command: %s %s starting\n", r->command, r->command_args);
                     async_start_process(context, i);
                 } else if (status == FAILURE_STATUS) {
                     fprintf(stderr, "Condition not met: command: %s %s not starting\n", r->command, r->command_args);
                 }
             }
-            fprintf(stdout, "Sensor: %s activated\n", r->sensors[s]);
+            fprintf(stderr, "Sensor: %s activated\n", r->sensors[s]);
             async_schedule_sensor(context, s);
         }
 	}
 
+}
+
+// Signal handling basics for dummy cycle
+void signal_handler(uv_signal_t *req, int signum)
+{
+    fprintf(stdout, "Stopping synapse service.\n");
+    uv_signal_stop(req);
+    uv_stop(loop);
 }
 
 int event_loop(int argc, char** argv) {
@@ -89,6 +73,8 @@ int event_loop(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
+    freopen("synapse.log", "a", stderr);
+    fprintf(stdout, "Starting synapse service.\n");
     contexts = (context_t*) calloc(sizeof(context_t), MAX_CONFIGS);
     // config_t* c = (config_t*) malloc(sizeof(config_t) * MAX_CONFIGS);
 	load_config(DEFAULT_CONFIGURATION_PATH, contexts);/*, MAX_CONFIGS);*/
@@ -139,6 +125,7 @@ int main(int argc, char** argv) {
 		}
   	}
   	return 0;*/
-
-    return event_loop(argc, argv);
+    int status = event_loop(argc, argv);
+    // fclose(stderr);
+    return status;
 }

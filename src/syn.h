@@ -13,7 +13,6 @@
 
 #include <uv.h>
 
-#define VERSION "0.1"
 #define MAX_CONFIGS 2
 #define MAX_SENSORS 8
 #define MAX_PROCESS 8
@@ -58,8 +57,6 @@ int64_t counter;
 typedef int (*init_sensor_function)(int args, char** buffer);
 
 void idle(uv_idle_t* handle);
-void sensor_event_cycle(uv_req_t* req);
-void process_event_cycle(uv_handle_t* handle);
 
 void async_start_sensor(uv_work_t *req_dyn);
 void async_stop_sensor(uv_work_t *req, int status);
@@ -69,9 +66,5 @@ void async_start_process(context_t* context, int i);
 void async_end_process(uv_process_t* child_req, int64_t exit_status, int term_signal);
 
 void main_cycle();
-
-/* Old functions from synapse scheduler. To be deprecated and removed. */
-void sync_start_sensor(const char* module, int max, char** buffer);
-void sync_start_process(char* process, char* process_args);
 
 #endif /* SYN_H */

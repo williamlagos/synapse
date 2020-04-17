@@ -50,19 +50,9 @@ void load_config(const char* filename, context_t* contexts)
             continue;
         }
 
-        // Checks if the key is for command then stores
-        if (strcmp(key, "state") == 0) {
-            r->state = (char*) malloc(strlen(value));
-            strcpy(r->state, strtok(value, " "));
-            size_t state_size = strlen(r->state);
-            r->state_args = (char*) malloc(strlen(value) - state_size);
-            strcpy(r->state_args, strtok(NULL, " "));
-            while((v = strtok(NULL, " ")) != NULL) sprintf(r->state_args, "%s %s", r->state_args, v);
-            continue;
-        }
-
-        // Checks if the key is for command then stores
+        
         if (strcmp(key, "sensors") == 0) {
+            // Checks if the key is for command then stores
             count = 0;
             v = strtok(value, ",");
             while (v != NULL) {
@@ -75,6 +65,13 @@ void load_config(const char* filename, context_t* contexts)
             // Check if the configuration was already read, then go to another
             if (r->command != NULL && r->name != NULL) r = &(++contexts)->config;
         } else if (strcmp(key, "state") == 0) {
+            // Checks if the key is for command then stores
+            r->state = (char*) malloc(strlen(value));
+            strcpy(r->state, strtok(value, " "));
+            size_t state_size = strlen(r->state);
+            r->state_args = (char*) malloc(strlen(value) - state_size);
+            strcpy(r->state_args, strtok(NULL, " "));
+            while((v = strtok(NULL, " ")) != NULL) sprintf(r->state_args, "%s %s", r->state_args, v);
             char default_sensor[16] = "./libimpulse.so";
             r->sensors[0] = (char*) malloc(sizeof(default_sensor));
             strcpy(r->sensors[0], default_sensor);
@@ -101,17 +98,6 @@ void start_fib(uv_work_t *req) {
 
 void stop_fib(uv_work_t *req, int status) {
     fprintf(stderr, "Done calculating %dth fibonacci\n", *(int *) req->data);
-}
-
-// Signal handling basics for dummy cycle
-void signal_handler(uv_signal_t *req, int signum)
-{
-    printf("Signal received!\n");
-    int i;
-    for (i = 0; i < FIB_UNTIL; i++) {
-        uv_cancel((uv_req_t*) &req[i]);
-    }
-    uv_signal_stop(req);
 }
 
 // Dummy fibonacci sequence cycle to test thread workers
