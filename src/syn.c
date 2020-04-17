@@ -39,6 +39,7 @@ void main_cycle() {
                 worker_t* worker = (worker_t*) malloc(sizeof(worker_t));
                 worker->status = -10;
 	            worker->worker_n = s;
+                // Verify if worker has arguments to pass
                 if (r->state_args == NULL || r->state == NULL) {
                     worker->worker_args = (char*) malloc(sizeof(char));
                     strcpy(worker->worker_args, " ");
