@@ -6,7 +6,7 @@
 
 int start(int max, char** buffer)
 {
-    char cmd[128];
+    char cmd[128] = "";
     char path[1024];
     if (max < 2) {
         strcpy(cmd, DEFAULT_COMMAND_PATH);
@@ -16,11 +16,13 @@ int start(int max, char** buffer)
             strcat(cmd, buffer[i]);
         }
     }
+    fprintf(stdout, "%s\n", cmd);
+    fprintf(stdout, "%d\n", max);
 
     int status = EXIT_SUCCESS;
 
     /* Open the command for reading. */
-    FILE *f = popen(DEFAULT_COMMAND_PATH, "r");
+    FILE *f = popen(cmd, "r");
     if(f == NULL){
         printf("Failed to run command\n" );
         exit(EXIT_FAILURE);

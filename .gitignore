@@ -71,3 +71,4 @@ synapse
 *.o
 *.file
 sensor/stream/stream
+impulse
