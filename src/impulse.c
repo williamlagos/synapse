@@ -6,38 +6,36 @@
 
 int start(int max, char** buffer)
 {
-    char cmd[128] = "";
-    char path[1024];
+    char cmd[256];
     if (max < 2) {
         strcpy(cmd, DEFAULT_COMMAND_PATH);
     } else {
-        fprintf(stdout, buffer[1]);
         for (int i = 1; i < max; i++) {
             strcat(cmd, buffer[i]);
+            strcat(cmd, " ");
         }
     }
-    fprintf(stdout, "%s\n", cmd);
-    fprintf(stdout, "%d\n", max);
-
-    int status = EXIT_SUCCESS;
 
     /* Open the command for reading. */
+    // fprintf(stdout, "command: %s\n", cmd);
     FILE *f = popen(cmd, "r");
     if(f == NULL){
-        printf("Failed to run command\n" );
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "error: failed to run command\n");
+        return EXIT_FAILURE;
     }
 
     /* Read the output a line at a time - output it. */
-    fgets(path, sizeof(path)-1, f);
-    if(strstr(path,"True") || strstr(path,"False")){
-        status = EXIT_SUCCESS;
-    } else {
-        status = EXIT_FAILURE;
-    }
+    // char path[1024];
+    // for (int i = 0; fgets(path, sizeof(path) - 1, f); i++) {
+    //     fprintf(stdout, "%d %s", i, path);
+    //     if (strstr(path,"foo")) return EXIT_SUCCESS;
+    //     else return EXIT_FAILURE;
+    // }
+    // fputs("\n", stdout);
 
-    pclose(f);
-    return status;
+    int status = WEXITSTATUS(pclose(f));
+    if (status == -1) return EXIT_FAILURE;
+    else return status;
 }
 
 int main(int argc, char** argv)
