@@ -38,6 +38,7 @@ typedef struct {
 	int status;
 	int worker_n;
 	char worker_name[64];
+	char* worker_args;
 } worker_t;
 
 typedef struct {

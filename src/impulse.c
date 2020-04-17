@@ -11,6 +11,7 @@ int start(int max, char** buffer)
     if (max < 2) {
         strcpy(cmd, DEFAULT_COMMAND_PATH);
     } else {
+        fprintf(stdout, buffer[1]);
         for (int i = 1; i < max; i++) {
             strcat(cmd, buffer[i]);
         }

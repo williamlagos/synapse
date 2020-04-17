@@ -61,7 +61,7 @@ void async_start_sensor(uv_work_t *req_dyn)
 
 	// Loads function from module
     // sprintf((char*) req_dyn->data, "%d", sensor_init());
-	d->status = (int) sensor_init(0, NULL);
+	d->status = (int) sensor_init(1, &d->worker_args);
 	uv_dlclose(lib);
 }
 

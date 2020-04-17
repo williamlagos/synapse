@@ -39,6 +39,13 @@ void main_cycle() {
                 worker_t* worker = (worker_t*) malloc(sizeof(worker_t));
                 worker->status = -10;
 	            worker->worker_n = s;
+                if (r->state_args == NULL || r->state == NULL) {
+                    worker->worker_args = (char*) malloc(sizeof(char));
+                    strcpy(worker->worker_args, " ");
+                } else {
+                    worker->worker_args = (char*) malloc(sizeof(r->state) + sizeof(r->state_args));
+                    sprintf(worker->worker_args, "%s %s", r->state, r->state_args);
+                }
 	            strcpy(worker->worker_name, context->config.sensors[s]);
 	            context->workers[s].data = (void*) worker;     
             } else {
