@@ -1,3 +1,6 @@
 [submodule "libuv"]
 	path = libuv
 	url = git@github.com:libuv/libuv
+[submodule "sensors"]
+	path = sensors
+	url = git@github.com:williamlagos/synapse-sensors.git
