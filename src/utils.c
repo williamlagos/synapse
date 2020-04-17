@@ -51,6 +51,17 @@ void load_config(const char* filename, context_t* contexts)
         }
 
         // Checks if the key is for command then stores
+        if (strcmp(key, "state") == 0) {
+            r->state = (char*) malloc(strlen(value));
+            strcpy(r->state, strtok(value, " "));
+            size_t state_size = strlen(r->state);
+            r->state_args = (char*) malloc(strlen(value) - state_size);
+            strcpy(r->state_args, strtok(NULL, " "));
+            while((v = strtok(NULL, " ")) != NULL) sprintf(r->state_args, "%s %s", r->state_args, v);
+            continue;
+        }
+
+        // Checks if the key is for command then stores
         if (strcmp(key, "sensors") == 0) {
             count = 0;
             v = strtok(value, ",");
@@ -63,6 +74,12 @@ void load_config(const char* filename, context_t* contexts)
             r->n_sensors = count;
             // Check if the configuration was already read, then go to another
             if (r->command != NULL && r->name != NULL) r = &(++contexts)->config;
+        } else if (strcmp(key, "state") == 0) {
+            char default_sensor[16] = "./libimpulse.so";
+            r->sensors[0] = (char*) malloc(sizeof(default_sensor));
+            strcpy(r->sensors[0], default_sensor);
+            r->n_sensors = 1;
+            if (r->command != NULL && r->state != NULL && r->name != NULL) r = &(++contexts)->config;
         }
 	}
 }
