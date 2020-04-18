@@ -1,6 +1,8 @@
 // #include "syn.h"
 #include "utils.h"
 
+#define MAX_CONFIGS 2
+
 void main_cycle() {
 	for (int i = 0; i < MAX_CONFIGS; i++) {
         context_t* context = &contexts[i];
@@ -73,59 +75,61 @@ int event_loop(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
-    freopen("synapse.log", "a", stderr);
-    fprintf(stdout, "Starting synapse service.\n");
-    contexts = (context_t*) calloc(sizeof(context_t), MAX_CONFIGS);
-    // config_t* c = (config_t*) malloc(sizeof(config_t) * MAX_CONFIGS);
-	load_config(DEFAULT_CONFIGURATION_PATH, contexts);/*, MAX_CONFIGS);*/
- 
-    /* Process main block:
-    // int count;
-	// int video = AV;
-	// char app[64], app_type[64];
-	if(apps.n_modules == 2){
-		strcpy(app,apps.modules[0]);
-		strcpy(app_type,apps.modules[1]);
-	}
-
-	free(r);
-
-    if(strstr(backend,"stream")) video = HDMI;
-	if(video == HDMI){
-		char path[128];
-		FILE *f = popen(HDMISTATUS_COMMAND_PATH, "r");
-		fgets(path, sizeof(path)-1, f);
-		if(strstr(path,"NTSC") || strstr(path,"PAL")){
-			fprintf(stdout,"Running in headless mode.\n");
-			exit(EXIT_SUCCESS);
-		}
-	}
-
-	if(strcmp(app,"dashboard") == 0) dashboard();
-	else {
-			char executable[128];
-			sprintf(executable,"/opt/efforia/applications/%s",app);
-			system(executable);
-			system("shutdown -h now");
-	}
-
-	// Open the file log and start the background service loop
-	//background();
-	char executable[MAX_BUFFER];
-  	while(LOOP) {
-    	sleep(1);
-		if(access(DEFAULT_SWITCHER_PATH,F_OK) != -1) {
-			kill(app_id,SIGTERM);
-			FILE *f = fopen(DEFAULT_SWITCHER_PATH,"r");
-			fgets(executable,sizeof(executable),f);
-			fclose(f);
-			remove(DEFAULT_SWITCHER_PATH);
-			system(executable);
-			dashboard();
-		}
-  	}
-  	return 0;*/
+    int state = BACKGROUND;
+    int n_contexts = DEFAULT_MAX_CONTEXT;
+    char logpath[128] = DEFAULT_LOG_PATH;
+    char cfgpath[128] = DEFAULT_CONFIGURATION_PATH;  
+    for (int i = 0; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            switch(argv[i][1]) {
+                case 'f':
+                    fprintf(stdout, "Starting synapse service.\n");
+                    state = FOREGROUND;
+                    break;
+                case 'l':
+                    // fprintf(stdout, "Collecting logs to %s file\n", argv[i + 1]);
+                    strcpy(logpath, argv[i + 1]);
+                    break;
+                case 'c':
+                    // fprintf(stdout, "Reading config file %s\n", argv[i + 1]);
+                    strcpy(cfgpath, argv[i + 1]);
+                    break;
+                case 'n':
+                    // fprintf(stdout, "Number of contexts increased to %d\n", atoi(argv[i + 1]));
+                    n_contexts = atoi(argv[i + 1]);
+                    break;
+                default:
+                    fprintf(stdout, "Option not recognized\n");
+                    exit(EXIT_FAILURE);
+                    break;
+            }
+        }
+        // fprintf(stdout, "%s\n", argv[i]);
+    }
+    freopen(logpath, "a", stderr);
+    fprintf(stderr, "Starting reading configuration on %s.\n", cfgpath);
+    contexts = (context_t*) calloc(sizeof(context_t), n_contexts);
+    load_config(cfgpath, contexts);
     int status = event_loop(argc, argv);
-    // fclose(stderr);
-    return status;
+    /*if (state == BACKGROUND) {
+        pid_t sid = 0;
+        pid_t process_id = 0;
+        // Create a fork of this application to start the daemon
+        process_id = fork();
+        if (process_id < 0) exit(EXIT_FAILURE);
+
+        // Exitting parent process
+        if (process_id > 0) {
+            fprintf(stderr, "Starting synapse service at %d.\n", process_id);
+            exit(EXIT_SUCCESS);
+        }
+        // Prepare the system to start the daemon
+        umask(0);
+        sid = setsid();
+        if (sid < 0) exit(EXIT_FAILURE);
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+    }*/
+    return 0;
 }

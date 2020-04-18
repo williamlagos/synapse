@@ -38,3 +38,334 @@ Done calculating 9th fibonacci
 Done calculating 6th fibonacci
 7th fibonacci is 21
 Done calculating 7th fibonacci
+0th fibonacci is 0
+Done calculating 0th fibonacci
+2th fibonacci is 2
+Done calculating 2th fibonacci
+3th fibonacci is 3
+Done calculating 3th fibonacci
+5th fibonacci is 8
+Done calculating 5th fibonacci
+4th fibonacci is 5
+Done calculating 4th fibonacci
+1th fibonacci is 1
+Done calculating 1th fibonacci
+8th fibonacci is 34
+Done calculating 8th fibonacci
+9th fibonacci is 55
+Done calculating 9th fibonacci
+6th fibonacci is 13
+Done calculating 6th fibonacci
+7th fibonacci is 21
+Done calculating 7th fibonacci
+Starting configuration for stream...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11297
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11300
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11304
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11310
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11342
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11355
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11358
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11371
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11374
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11377
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11381
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11384
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11388
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11407
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting configuration for stream...
+Status worker: 0
+Condition met: command: cat worked1.file starting
+Launched process with ID 11428
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Status worker: 1
+Condition not met: command: cat worked2.file not starting
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Process exited with status 0, signal 0
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting synapse service at 13898.
+Starting synapse service at 14011.
+Starting synapse service at 14077.
+Starting synapse service at 14427.
+Starting synapse service at 14618.
+Starting synapse service at 14655.
+Starting reading configuration on default.cfg.
+0th fibonacci is 0
+Done calculating 0th fibonacci
+2th fibonacci is 2
+Done calculating 2th fibonacci
+3th fibonacci is 3
+Done calculating 3th fibonacci
+4th fibonacci is 5
+Done calculating 4th fibonacci
+5th fibonacci is 8
+Done calculating 5th fibonacci
+1th fibonacci is 1
+Done calculating 1th fibonacci
+8th fibonacci is 34
+Done calculating 8th fibonacci
+9th fibonacci is 55
+Done calculating 9th fibonacci
+6th fibonacci is 13
+Done calculating 6th fibonacci
+7th fibonacci is 21
+Done calculating 7th fibonacci
+Starting configuration for stream...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting reading configuration on default.cfg.
+0th fibonacci is 0
+Done calculating 0th fibonacci
+2th fibonacci is 2
+Done calculating 2th fibonacci
+3th fibonacci is 3
+Done calculating 3th fibonacci
+4th fibonacci is 5
+Done calculating 4th fibonacci
+5th fibonacci is 8
+Done calculating 5th fibonacci
+1th fibonacci is 1
+Done calculating 1th fibonacci
+8th fibonacci is 34
+Done calculating 8th fibonacci
+9th fibonacci is 55
+Done calculating 9th fibonacci
+6th fibonacci is 13
+Done calculating 6th fibonacci
+7th fibonacci is 21
+Done calculating 7th fibonacci
+Starting configuration for stream...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1
+Starting reading configuration on default.cfg.
+0th fibonacci is 0
+Done calculating 0th fibonacci
+2th fibonacci is 2
+Done calculating 2th fibonacci
+3th fibonacci is 3
+Done calculating 3th fibonacci
+5th fibonacci is 8
+Done calculating 5th fibonacci
+4th fibonacci is 5
+Done calculating 4th fibonacci
+1th fibonacci is 1
+Done calculating 1th fibonacci
+8th fibonacci is 34
+Done calculating 8th fibonacci
+9th fibonacci is 55
+Done calculating 9th fibonacci
+6th fibonacci is 13
+Done calculating 6th fibonacci
+7th fibonacci is 21
+Done calculating 7th fibonacci
+Starting configuration for stream...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Starting configuration for hotspot...
+Sensor: ./libimpulse.so activated
+Opening thread for ./libimpulse.so
+Done loading ./libimpulse.so, status: 0
+Done loading ./libimpulse.so, status: 1

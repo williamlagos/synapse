@@ -1,5 +1,7 @@
 #include "utils.h"
 
+#define MAX_BUFFER 128
+
 // Read file and return lines buffer to manipulate
 char** load_buffer(const char* filename, int* cnt)
 {

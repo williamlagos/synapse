@@ -13,13 +13,14 @@
 
 #include <uv.h>
 
-#define MAX_CONFIGS 2
+#define BACKGROUND 0
+#define FOREGROUND 1
 #define MAX_SENSORS 8
-#define MAX_PROCESS 8
-#define MAX_BUFFER 128
-#define MAX_PATH_SIZE 64
 #define SUCCESS_STATUS 0 
 #define FAILURE_STATUS 1 
+#define DEFAULT_MAX_CONTEXT 8
+#define DEFAULT_MAX_PROCESS 8
+#define DEFAULT_LOG_PATH "synapse.log"
 #define DEFAULT_CONFIGURATION_PATH "default.cfg"
 #define DEFAULT_SWITCHER_PATH "/tmp/synapse.access"
 
