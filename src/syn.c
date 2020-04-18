@@ -83,19 +83,19 @@ int main(int argc, char** argv) {
         if (argv[i][0] == '-') {
             switch(argv[i][1]) {
                 case 'f':
-                    fprintf(stdout, "Starting synapse service.\n");
+                    fprintf(stdout, "Starting synapse service on foreground.\n");
                     state = FOREGROUND;
                     break;
                 case 'l':
-                    // fprintf(stdout, "Collecting logs to %s file\n", argv[i + 1]);
+                    // Collecting logs to file
                     strcpy(logpath, argv[i + 1]);
                     break;
                 case 'c':
-                    // fprintf(stdout, "Reading config file %s\n", argv[i + 1]);
+                    // Reading config file 
                     strcpy(cfgpath, argv[i + 1]);
                     break;
                 case 'n':
-                    // fprintf(stdout, "Number of contexts increased to %d\n", atoi(argv[i + 1]));
+                    // Number of contexts increased to
                     n_contexts = atoi(argv[i + 1]);
                     break;
                 default:
@@ -104,14 +104,8 @@ int main(int argc, char** argv) {
                     break;
             }
         }
-        // fprintf(stdout, "%s\n", argv[i]);
     }
-    freopen(logpath, "a", stderr);
-    fprintf(stderr, "Starting reading configuration on %s.\n", cfgpath);
-    contexts = (context_t*) calloc(sizeof(context_t), n_contexts);
-    load_config(cfgpath, contexts);
-    int status = event_loop(argc, argv);
-    /*if (state == BACKGROUND) {
+    if (state == BACKGROUND) {
         pid_t sid = 0;
         pid_t process_id = 0;
         // Create a fork of this application to start the daemon
@@ -127,9 +121,14 @@ int main(int argc, char** argv) {
         umask(0);
         sid = setsid();
         if (sid < 0) exit(EXIT_FAILURE);
-        close(STDIN_FILENO);
-        close(STDOUT_FILENO);
-        close(STDERR_FILENO);
-    }*/
+        // close(STDIN_FILENO);
+        // close(STDOUT_FILENO);
+        // close(STDERR_FILENO);
+    }
+    freopen(logpath, "a", stderr);
+    fprintf(stderr, "Starting reading configuration on %s.\n", cfgpath);
+    contexts = (context_t*) calloc(sizeof(context_t), n_contexts);
+    load_config(cfgpath, contexts);
+    int status = event_loop(argc, argv);
     return 0;
 }
