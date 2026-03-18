@@ -1,5 +1,6 @@
 // #include "syn.h"
 #include "utils.h"
+#include "switcher.h"
 
 #define MAX_CONFIGS 2
 
@@ -70,6 +71,8 @@ int event_loop(int argc, char** argv) {
     uv_timer_t timer_req;
     uv_timer_init(loop, &timer_req);
     uv_timer_start(&timer_req, main_cycle, 5000, 2000);
+
+    start_switcher(loop);
 
     return uv_run(loop, UV_RUN_DEFAULT);
 }
