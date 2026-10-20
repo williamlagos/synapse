@@ -5,7 +5,7 @@
 
 #define FIB_UNTIL 10
 
-uv_work_t req[FIB_UNTIL];
+extern uv_work_t req[FIB_UNTIL];
 
 void signal_handler(uv_signal_t *req, int signum);
 char** load_buffer(const char* filename, int* cnt);

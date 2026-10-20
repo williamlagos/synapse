@@ -7,6 +7,7 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 
 #define DEFAULT_COMMAND_PATH "cat worked.file"
 #define VERSION "0.1"
@@ -58,25 +59,6 @@ void start_process(char* process, char* process_args)
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
-
-	/*void dashboard() {
-	//char executable[MAX_BUFFER];
-	//sprintf(executable,"%s &",DASHBOARD_PATH);
-	app_id = fork();
-	if(app_id == 0){
-		fprintf(stdout,"Started dashboard: %d",app_id);
-		execv(DASHBOARD_PATH,NULL);
-	}
-	//sprintf(executable,"%s event",CORONAE_PATH);
-	//system(executable);
-	}*/
-
-	/*void sync_start_process(const char* module)
-	{
-		char executable[MAX_BUFFER];
-		sprintf(executable,"%s %s",CORONAE_PATH,module);
-		system(executable);
-	}*/
 }
 
 int start(int max, char** buffer)
@@ -93,26 +75,16 @@ int start(int max, char** buffer)
         }
     }
 
-    /* Open the command for reading. */
-    // fprintf(stdout, "command: %s\n", cmd);
     FILE *f = popen(cmd, "r");
     if(f == NULL){
         fprintf(stderr, "error: failed to run command\n");
         return EXIT_FAILURE;
     }
 
-    /* Read the output a line at a time - output it. */
-    // char path[1024];
-    // for (int i = 0; fgets(path, sizeof(path) - 1, f); i++) {
-    //     fprintf(stdout, "%d %s", i, path);
-    //     if (strstr(path,"foo")) return EXIT_SUCCESS;
-    //     else return EXIT_FAILURE;
-    // }
-    // fputs("\n", stdout);
-
-    int status = WEXITSTATUS(pclose(f));
-    if (status == -1) return EXIT_FAILURE;
-    else return status;
+    int pstatus = pclose(f);
+    if (pstatus == -1) return EXIT_FAILURE;
+    int status = WEXITSTATUS(pstatus);
+    return status;
 }
 
 int main(int argc, char** argv)

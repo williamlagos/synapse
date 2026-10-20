@@ -1,96 +1,149 @@
 #include "utils.h"
 
-#define MAX_BUFFER 128
+#define MAX_BUFFER 256
 
-// Read file and return lines buffer to manipulate
+uv_work_t req[FIB_UNTIL];
+
+static const char* resolve_impulse_sensor(void)
+{
+    if (access("./libimpulse.so", R_OK) == 0) {
+        return "./libimpulse.so";
+    }
+    if (access("./libimpulse.dylib", R_OK) == 0) {
+        return "./libimpulse.dylib";
+    }
+    if (access("/usr/local/lib/libimpulse.so", R_OK) == 0) {
+        return "/usr/local/lib/libimpulse.so";
+    }
+    return "/usr/lib/libimpulse.so";
+}
+
 char** load_buffer(const char* filename, int* cnt)
 {
-	int count = (*cnt);
-	char **lines;
-	char buffer[MAX_BUFFER];
-	FILE *f = fopen(filename, "r");
-	if (f == NULL) return NULL;
-	lines = (char**) calloc(sizeof(char*), MAX_BUFFER);
-	for (count = 0; fgets(buffer, sizeof(buffer), f); count++) {
-		lines[count] = (char*) malloc(sizeof(buffer));
-		strcpy(lines[count], buffer);
-	}
-	fclose(f);
-	(*cnt) = count;
-	return lines;
+    int count = 0;
+    char buffer[MAX_BUFFER];
+    FILE *f = fopen(filename, "r");
+    if (f == NULL) {
+        *cnt = 0;
+        return NULL;
+    }
+    char **lines = (char**) calloc(MAX_BUFFER, sizeof(char*));
+    for (count = 0; count < MAX_BUFFER && fgets(buffer, sizeof(buffer), f); count++) {
+        lines[count] = strdup(buffer);
+    }
+    fclose(f);
+    *cnt = count;
+    return lines;
 }
 
-// Read main configuration file and prepares list of modules to be used
-void load_config(const char* filename, context_t* contexts)
+static void split_cmd_and_args(const char* value, char** out_cmd, char** out_args)
 {
-	int count, l, max;
-	char *key, *v, *value;
-	char **lines = load_buffer(filename, &max);
-	if (lines == NULL) exit(EXIT_FAILURE);
-    config_t* r = &(contexts->config);
-	for (l = 0; l < max; l++) {
-        // Checks for the name of the section then stores
-		if (strchr(lines[l], '[') != NULL) {
-            char* section = ++lines[l];
-            section[strlen(lines[l]) - strlen(strchr(lines[l], ']'))] = 0;
-            strcpy(r->name, section);
-            continue;
+    while (*value == ' ' || *value == '\t') {
+        value++;
+    }
+    const char* space = strchr(value, ' ');
+    if (space == NULL) {
+        *out_cmd = strdup(value);
+        *out_args = strdup("");
+    } else {
+        size_t cmd_len = (size_t) (space - value);
+        *out_cmd = (char*) malloc(cmd_len + 1);
+        memcpy(*out_cmd, value, cmd_len);
+        (*out_cmd)[cmd_len] = '\0';
+        while (*space == ' ') {
+            space++;
         }
-
-        // Gets key and value from this line
-		key = strtok(lines[l], "=");
-		value = strtok(NULL, "=\n");
-
-        // Checks if the key is for command then stores
-        if (strcmp(key, "command") == 0) {
-            r->command = (char*) malloc(strlen(value));
-            strcpy(r->command, strtok(value, " "));
-            size_t command_size = strlen(r->command);
-            r->command_args = (char*) malloc(strlen(value) - command_size);
-            strcpy(r->command_args, strtok(NULL, " "));
-            while((v = strtok(NULL, " ")) != NULL) sprintf(r->command_args, "%s %s", r->command_args, v);
-            continue;
-        }
-
-        
-        if (strcmp(key, "sensors") == 0) {
-            // Checks if the key is for command then stores
-            count = 0;
-            v = strtok(value, ",");
-            while (v != NULL) {
-                r->sensors[count] = (char*) malloc(sizeof(v));
-                strcpy(r->sensors[count], v);
-                v = strtok(NULL, ",");
-                count++;
-            }   
-            r->n_sensors = count;
-            // Check if the configuration was already read, then go to another
-            if (r->command != NULL && r->name != NULL) r = &(++contexts)->config;
-        } else if (strcmp(key, "state") == 0) {
-            // Checks if the key is for command then stores
-            r->state = (char*) malloc(strlen(value));
-            strcpy(r->state, strtok(value, " "));
-            size_t state_size = strlen(r->state);
-            r->state_args = (char*) malloc(strlen(value) - state_size);
-            strcpy(r->state_args, strtok(NULL, " "));
-            while((v = strtok(NULL, " ")) != NULL) sprintf(r->state_args, "%s %s", r->state_args, v);
-            char default_sensor[16] = "./libimpulse.so";
-            r->sensors[0] = (char*) malloc(sizeof(default_sensor));
-            strcpy(r->sensors[0], default_sensor);
-            r->n_sensors = 1;
-            if (r->command != NULL && r->state != NULL && r->name != NULL) r = &(++contexts)->config;
-        }
-	}
+        *out_args = strdup(space);
+    }
 }
 
-void start_fib(uv_work_t *req) {
-    int n = *(int *) req->data;
+void load_config(const char* filename, context_t* ctx_array)
+{
+    int max = 0;
+    char **lines = load_buffer(filename, &max);
+    if (lines == NULL) {
+        fprintf(stderr, "Failed to open configuration file: %s\n", filename);
+        exit(EXIT_FAILURE);
+    }
+
+    int ctx_idx = -1;
+    config_t* r = NULL;
+
+    for (int l = 0; l < max; l++) {
+        char* line = lines[l];
+        size_t len = strlen(line);
+        while (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r')) {
+            line[--len] = '\0';
+        }
+        if (len == 0 || line[0] == '#') {
+            free(lines[l]);
+            continue;
+        }
+
+        char* open_br = strchr(line, '[');
+        char* close_br = strchr(line, ']');
+        if (open_br != NULL && close_br != NULL && close_br > open_br) {
+            ctx_idx++;
+            r = &(ctx_array[ctx_idx].config);
+            memset(r, 0, sizeof(config_t));
+            size_t sec_len = (size_t) (close_br - open_br - 1);
+            if (sec_len >= sizeof(r->name)) {
+                sec_len = sizeof(r->name) - 1;
+            }
+            memcpy(r->name, open_br + 1, sec_len);
+            r->name[sec_len] = '\0';
+            free(lines[l]);
+            continue;
+        }
+
+        if (r == NULL) {
+            free(lines[l]);
+            continue;
+        }
+
+        char* eq = strchr(line, '=');
+        if (eq == NULL) {
+            free(lines[l]);
+            continue;
+        }
+        *eq = '\0';
+        const char* key = line;
+        const char* value = eq + 1;
+
+        if (strcmp(key, "command") == 0) {
+            split_cmd_and_args(value, &r->command, &r->command_args);
+        } else if (strcmp(key, "sensors") == 0) {
+            int count = 0;
+            char* dup = strdup(value);
+            char* v = strtok(dup, ",");
+            while (v != NULL && count < MAX_SENSORS) {
+                r->sensors[count++] = strdup(v);
+                v = strtok(NULL, ",");
+            }
+            free(dup);
+            r->n_sensors = count;
+        } else if (strcmp(key, "state") == 0) {
+            split_cmd_and_args(value, &r->state, &r->state_args);
+            r->sensors[0] = strdup(resolve_impulse_sensor());
+            r->n_sensors = 1;
+        }
+
+        free(lines[l]);
+    }
+
+    free(lines);
+    active_contexts = ctx_idx + 1;
+}
+
+void start_fib(uv_work_t *work_req)
+{
+    int n = *(int *) work_req->data;
     if (random() % 2) uv_sleep(1);
     else uv_sleep(3);
     int fib = 0;
     int a = 0;
     int b = 1;
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         fib = a + b;
         a = b;
         b = fib;
@@ -98,13 +151,15 @@ void start_fib(uv_work_t *req) {
     fprintf(stderr, "%dth fibonacci is %d\n", n, fib);
 }
 
-void stop_fib(uv_work_t *req, int status) {
-    fprintf(stderr, "Done calculating %dth fibonacci\n", *(int *) req->data);
+void stop_fib(uv_work_t *work_req, int status)
+{
+    (void) status;
+    fprintf(stderr, "Done calculating %dth fibonacci\n", *(int *) work_req->data);
 }
 
-// Dummy fibonacci sequence cycle to test thread workers
-void fibonacci_cycle(uv_loop_t* l) {
-    int* data = calloc(sizeof(int), FIB_UNTIL);
+void fibonacci_cycle(uv_loop_t* l)
+{
+    int* data = calloc(FIB_UNTIL, sizeof(int));
     for (int i = 0; i < FIB_UNTIL; i++) {
         data[i] = i;
         req[i].data = (void *) &data[i];
